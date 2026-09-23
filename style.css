@@ -363,3 +363,47 @@ button:active {
         padding: 30px 22px;
     }
 }
+.race-info {
+    margin-top: 12px;
+    padding: 15px;
+    border: 1px solid rgba(200, 170, 100, 0.3);
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    color: #d8d0c0;
+}
+
+.race-info strong {
+    color: #d8b76a;
+    font-family: 'Cinzel', serif;
+    font-size: 1.1rem;
+}
+
+.race-info p {
+    margin: 8px 0;
+}
+
+.race-bonus {
+    color: #c9a85c;
+    font-weight: 600;
+}
+
+.character-subtitle {
+    color: #c9a85c;
+    font-family: 'MedievalSharp', cursive;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.race-description,
+.class-description {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.2);
+    border-left: 3px solid #8f7135;
+}
+
+.race-description h3,
+.class-description h3 {
+    color: #d8b76a;
+    margin-top: 0;
+}
