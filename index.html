@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Realm of Ash</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <main id="app">
+
+        <!-- Title Screen -->
+        <section id="title-screen" class="screen active">
+            <div class="title-container">
+                <h1>Realm of Ash</h1>
+                <p>A Fantasy RPG Adventure</p>
+
+                <button onclick="showCharacterCreation()">
+                    Begin Adventure
+                </button>
+
+                <button onclick="showAbout()">
+                    About
+                </button>
+            </div>
+        </section>
+
+
+        <!-- Character Creation -->
+        <section id="character-screen" class="screen">
+            <div class="panel">
+                <h2>Create Your Character</h2>
+
+                <label for="character-name">Character Name</label>
+                <input type="text"
+                       id="character-name"
+                       placeholder="Enter your name">
+
+                <label for="character-race">Race</label>
+                <select id="character-race">
+                    <option value="Human">Human</option>
+                    <option value="Elf">Elf</option>
+                    <option value="Dwarf">Dwarf</option>
+                    <option value="Orc">Orc</option>
+                </select>
+
+                <label for="character-class">Class</label>
+                <select id="character-class">
+                    <option value="Warrior">Warrior</option>
+                    <option value="Ranger">Ranger</option>
+                    <option value="Mage">Mage</option>
+                    <option value="Rogue">Rogue</option>
+                </select>
+
+                <button onclick="createCharacter()">
+                    Create Character
+                </button>
+
+                <button class="secondary" onclick="returnToTitle()">
+                    Back
+                </button>
+            </div>
+        </section>
+
+
+        <!-- Main Game -->
+        <section id="game-screen" class="screen">
+            <div class="game-container">
+
+                <header>
+                    <h1>Realm of Ash</h1>
+                    <p id="welcome-message"></p>
+                </header>
+
+                <div class="menu-grid">
+
+                    <button onclick="showComingSoon('Character')">
+                        ⚔️ Character
+                    </button>
+
+                    <button onclick="showComingSoon('Inventory')">
+                        🎒 Inventory
+                    </button>
+
+                    <button onclick="showComingSoon('Explore')">
+                        🗺️ Explore
+                    </button>
+
+                    <button onclick="showComingSoon('Quests')">
+                        📜 Quests
+                    </button>
+
+                </div>
+
+            </div>
+        </section>
+
+
+        <!-- About -->
+        <section id="about-screen" class="screen">
+            <div class="panel">
+                <h2>Realm of Ash</h2>
+
+                <p>
+                    A medieval fantasy RPG where your adventure
+                    begins in a world filled with kingdoms, monsters,
+                    magic, and mystery.
+                </p>
+
+                <button onclick="returnToTitle()">
+                    Back
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
