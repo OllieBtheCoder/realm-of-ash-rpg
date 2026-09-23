@@ -60,7 +60,6 @@
                     maxlength="20"
                 >
 
-
                 <label for="character-race">
                     Race
                 </label>
@@ -72,6 +71,9 @@
                     <option value="Orc">Orc</option>
                 </select>
 
+                <div id="race-info" class="race-info">
+                    Choose a race to see its advantages.
+                </div>
 
                 <label for="character-class">
                     Class
@@ -84,13 +86,6 @@
                     <option value="Rogue">Rogue</option>
                 </select>
 
-                <div id="race-info" class="race-info">
-                    Choose a race to see its advantages.
-                </div>
-
-
-                <!-- Class information -->
-
                 <div id="class-info">
 
                     <h3>Warrior</h3>
@@ -101,9 +96,6 @@
                     </p>
 
                 </div>
-
-
-                <!-- Character stats preview -->
 
                 <div id="stat-preview">
 
@@ -135,7 +127,6 @@
                     </p>
 
                 </div>
-
 
                 <button onclick="createCharacter()">
                     Create Character
@@ -169,7 +160,6 @@
 
                 </header>
 
-
                 <div class="menu-grid">
 
                     <button onclick="showCharacter()">
@@ -180,7 +170,7 @@
                         🎒 Inventory
                     </button>
 
-                    <button onclick="showComingSoon('Explore')">
+                    <button onclick="startExploration()">
                         🗺️ Explore
                     </button>
 
@@ -250,6 +240,107 @@
 
 
         <!-- ========================= -->
+        <!-- BATTLE SCREEN -->
+        <!-- ========================= -->
+
+        <section id="battle-screen" class="screen">
+
+            <div class="battle-container">
+
+                <h1>⚔️ Battle</h1>
+
+                <div class="battle-fighters">
+
+                    <!-- PLAYER -->
+
+                    <div class="fighter">
+
+                        <h2 id="battle-player-name">
+                            Player
+                        </h2>
+
+                        <div class="health-bar">
+                            <div
+                                id="player-health-bar"
+                                class="health-fill"
+                            ></div>
+                        </div>
+
+                        <p>
+                            ❤️
+                            <span id="battle-player-health"></span>
+                        </p>
+
+                    </div>
+
+
+                    <div class="vs">
+                        VS
+                    </div>
+
+
+                    <!-- ENEMY -->
+
+                    <div class="fighter">
+
+                        <h2 id="battle-enemy-name">
+                            Enemy
+                        </h2>
+
+                        <div class="health-bar">
+                            <div
+                                id="enemy-health-bar"
+                                class="health-fill"
+                            ></div>
+                        </div>
+
+                        <p>
+                            ❤️
+                            <span id="battle-enemy-health"></span>
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+                <!-- BATTLE LOG -->
+
+                <div class="battle-log">
+
+                    <h3>Battle Log</h3>
+
+                    <div id="battle-log-text">
+                        A battle has begun!
+                    </div>
+
+                </div>
+
+
+                <!-- ACTIONS -->
+
+                <div class="battle-actions">
+
+                    <button onclick="playerAttack()">
+                        ⚔️ Attack
+                    </button>
+
+                    <button onclick="showComingSoon('Abilities')">
+                        ✨ Abilities
+                    </button>
+
+                    <button onclick="fleeBattle()">
+                        🏃 Flee
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
         <!-- ABOUT -->
         <!-- ========================= -->
 
@@ -274,7 +365,6 @@
         </section>
 
     </main>
-
 
     <script src="script.js"></script>
 
