@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Realm of Ash</title>
+
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -11,10 +14,16 @@
 
     <main id="app">
 
-        <!-- Title Screen -->
+        <!-- ========================= -->
+        <!-- TITLE SCREEN -->
+        <!-- ========================= -->
+
         <section id="title-screen" class="screen active">
+
             <div class="title-container">
+
                 <h1>Realm of Ash</h1>
+
                 <p>A Fantasy RPG Adventure</p>
 
                 <button onclick="showCharacterCreation()">
@@ -24,21 +33,38 @@
                 <button onclick="showAbout()">
                     About
                 </button>
+
             </div>
+
         </section>
 
 
-        <!-- Character Creation -->
+        <!-- ========================= -->
+        <!-- CHARACTER CREATION -->
+        <!-- ========================= -->
+
         <section id="character-screen" class="screen">
+
             <div class="panel">
+
                 <h2>Create Your Character</h2>
 
-                <label for="character-name">Character Name</label>
-                <input type="text"
-                       id="character-name"
-                       placeholder="Enter your name">
+                <label for="character-name">
+                    Character Name
+                </label>
 
-                <label for="character-race">Race</label>
+                <input
+                    type="text"
+                    id="character-name"
+                    placeholder="Enter your name"
+                    maxlength="20"
+                >
+
+
+                <label for="character-race">
+                    Race
+                </label>
+
                 <select id="character-race">
                     <option value="Human">Human</option>
                     <option value="Elf">Elf</option>
@@ -46,7 +72,11 @@
                     <option value="Orc">Orc</option>
                 </select>
 
-                <label for="character-class">Class</label>
+
+                <label for="character-class">
+                    Class
+                </label>
+
                 <select id="character-class">
                     <option value="Warrior">Warrior</option>
                     <option value="Ranger">Ranger</option>
@@ -54,29 +84,91 @@
                     <option value="Rogue">Rogue</option>
                 </select>
 
+
+                <!-- Class information -->
+
+                <div id="class-info">
+
+                    <h3>Warrior</h3>
+
+                    <p>
+                        Strong and heavily armored warriors
+                        who excel in close combat.
+                    </p>
+
+                </div>
+
+
+                <!-- Character stats preview -->
+
+                <div id="stat-preview">
+
+                    <h3>Starting Stats</h3>
+
+                    <p>
+                        Health:
+                        <span id="preview-health">120</span>
+                    </p>
+
+                    <p>
+                        Attack:
+                        <span id="preview-attack">18</span>
+                    </p>
+
+                    <p>
+                        Defense:
+                        <span id="preview-defense">15</span>
+                    </p>
+
+                    <p>
+                        Speed:
+                        <span id="preview-speed">8</span>
+                    </p>
+
+                    <p>
+                        Magic:
+                        <span id="preview-magic">5</span>
+                    </p>
+
+                </div>
+
+
                 <button onclick="createCharacter()">
                     Create Character
                 </button>
 
-                <button class="secondary" onclick="returnToTitle()">
+                <button
+                    class="secondary"
+                    onclick="returnToTitle()"
+                >
                     Back
                 </button>
+
             </div>
+
         </section>
 
 
-        <!-- Main Game -->
+        <!-- ========================= -->
+        <!-- MAIN GAME -->
+        <!-- ========================= -->
+
         <section id="game-screen" class="screen">
+
             <div class="game-container">
 
                 <header>
+
                     <h1>Realm of Ash</h1>
+
                     <p id="welcome-message"></p>
+
                 </header>
+
 
                 <div class="menu-grid">
 
-                    <button onclick="showComingSoon('Character')">
+                    <button onclick="showCharacter()">
                         ⚔️ Character
                     </button>
 
@@ -95,28 +187,93 @@
                 </div>
 
             </div>
+
         </section>
 
 
-        <!-- About -->
-        <section id="about-screen" class="screen">
+        <!-- ========================= -->
+        <!-- CHARACTER DETAILS -->
+        <!-- ========================= -->
+
+        <section id="character-details-screen" class="screen">
+
             <div class="panel">
+
+                <h2 id="character-details-name">
+                    Character
+                </h2>
+
+                <p id="character-details-race"></p>
+
+                <p id="character-details-class"></p>
+
+                <hr>
+
+                <h3>Stats</h3>
+
+                <p>
+                    ❤️ Health:
+                    <span id="character-details-health"></span>
+                </p>
+
+                <p>
+                    ⚔️ Attack:
+                    <span id="character-details-attack"></span>
+                </p>
+
+                <p>
+                    🛡️ Defense:
+                    <span id="character-details-defense"></span>
+                </p>
+
+                <p>
+                    ⚡ Speed:
+                    <span id="character-details-speed"></span>
+                </p>
+
+                <p>
+                    🔮 Magic:
+                    <span id="character-details-magic"></span>
+                </p>
+
+                <button onclick="returnToGame()">
+                    Back
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- ========================= -->
+        <!-- ABOUT -->
+        <!-- ========================= -->
+
+        <section id="about-screen" class="screen">
+
+            <div class="panel">
+
                 <h2>Realm of Ash</h2>
 
                 <p>
                     A medieval fantasy RPG where your adventure
-                    begins in a world filled with kingdoms, monsters,
-                    magic, and mystery.
+                    begins in a world filled with kingdoms,
+                    monsters, magic, and mystery.
                 </p>
 
                 <button onclick="returnToTitle()">
                     Back
                 </button>
+
             </div>
+
         </section>
 
     </main>
 
+
     <script src="script.js"></script>
+
 </body>
+
 </html>
