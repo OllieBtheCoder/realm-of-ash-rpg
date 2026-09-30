@@ -2,13 +2,19 @@ let player = {
     name: "",
     race: "",
     class: "",
+
     health: 0,
     maxHealth: 0,
     currentHealth: 0,
+
     attack: 0,
     defense: 0,
     speed: 0,
-    magic: 0
+    magic: 0,
+
+    level: 1,
+    xp: 0,
+    xpToNextLevel: 100
 };
 
 
@@ -116,28 +122,32 @@ const enemies = [
         name: "Goblin",
         health: 50,
         attack: 10,
-        defense: 5
+        defense: 5,
+        xp: 20
     },
 
     {
         name: "Wolf",
         health: 40,
         attack: 12,
-        defense: 3
+        defense: 3,
+        xp: 25
     },
 
     {
         name: "Orc",
         health: 80,
         attack: 15,
-        defense: 10
+        defense: 10,
+        xp: 40
     },
 
     {
         name: "Troll",
         health: 120,
         attack: 20,
-        defense: 15
+        defense: 15,
+        xp: 60
     }
 
 ];
@@ -145,12 +155,6 @@ const enemies = [
 
 let currentEnemy = null;
 let battleActive = false;
-
-
-// =========================
-// ABILITY STATE
-// =========================
-
 let abilityCooldown = 0;
 
 
@@ -183,14 +187,20 @@ function showCharacterCreation() {
 
 function updateRacePreview() {
 
-    const raceSelect = document.getElementById("character-race");
-    const raceInfo = document.getElementById("race-info");
+    const raceSelect =
+        document.getElementById("character-race");
 
-    const selectedRace = raceSelect.value;
+    const raceInfo =
+        document.getElementById("race-info");
 
-    const race = races[selectedRace];
+    const selectedRace =
+        raceSelect.value;
+
+    const race =
+        races[selectedRace];
 
     if (!race) {
+
         raceInfo.innerHTML =
             "Choose a race to see its advantages.";
 
@@ -261,11 +271,17 @@ function updateClassPreview() {
     const previewMagic =
         document.getElementById("preview-magic");
 
-    const selectedClass = classSelect.value;
-    const selectedRace = raceSelect.value;
+    const selectedClass =
+        classSelect.value;
 
-    const classData = classes[selectedClass];
-    const raceData = races[selectedRace];
+    const selectedRace =
+        raceSelect.value;
+
+    const classData =
+        classes[selectedClass];
+
+    const raceData =
+        races[selectedRace];
 
     if (!classData) {
         return;
@@ -297,7 +313,6 @@ function updateClassPreview() {
         defense += raceData.defense;
         speed += raceData.speed;
         magic += raceData.magic;
-
     }
 
     previewHealth.textContent = health;
@@ -323,17 +338,27 @@ function createCharacter() {
     const classSelect =
         document.getElementById("character-class");
 
-    const name = nameInput.value.trim();
-    const race = raceSelect.value;
-    const selectedClass = classSelect.value;
+    const name =
+        nameInput.value.trim();
+
+    const race =
+        raceSelect.value;
+
+    const selectedClass =
+        classSelect.value;
 
     if (!name) {
+
         alert("Please enter a character name.");
+
         return;
     }
 
-    const classData = classes[selectedClass];
-    const raceData = races[race];
+    const classData =
+        classes[selectedClass];
+
+    const raceData =
+        races[race];
 
     player.name = name;
     player.race = race;
@@ -342,8 +367,11 @@ function createCharacter() {
     player.health =
         classData.health + raceData.health;
 
-    player.maxHealth = player.health;
-    player.currentHealth = player.health;
+    player.maxHealth =
+        player.health;
+
+    player.currentHealth =
+        player.health;
 
     player.attack =
         classData.attack + raceData.attack;
@@ -356,6 +384,10 @@ function createCharacter() {
 
     player.magic =
         classData.magic + raceData.magic;
+
+    player.level = 1;
+    player.xp = 0;
+    player.xpToNextLevel = 100;
 
     document.getElementById("welcome-message").textContent =
         `Welcome, ${player.name}. Your adventure begins.`;
@@ -405,7 +437,9 @@ function showCharacter() {
 function startExploration() {
 
     if (!player.name) {
+
         alert("Create a character first!");
+
         return;
     }
 
@@ -488,6 +522,7 @@ function useAbility() {
     }
 
     if (abilityCooldown > 0) {
+
         addBattleLog(
             `Your ability is on cooldown for ${abilityCooldown} more turn(s).`
         );
@@ -496,78 +531,66 @@ function useAbility() {
     }
 
     let damage = 0;
-    let abilityName = classes[player.class].ability;
 
+    const abilityName =
+        classes[player.class].ability;
 
-    // =========================
-    // WARRIOR
-    // =========================
 
     if (player.class === "Warrior") {
 
         damage =
             Math.max(
                 1,
-                player.attack * 2 - currentEnemy.defense
+                player.attack * 2 -
+                currentEnemy.defense
             );
 
     }
 
-
-    // =========================
-    // RANGER
-    // =========================
 
     else if (player.class === "Ranger") {
 
         damage =
             Math.max(
                 1,
-                player.attack + player.speed - currentEnemy.defense
+                player.attack +
+                player.speed -
+                currentEnemy.defense
             );
 
     }
 
-
-    // =========================
-    // MAGE
-    // =========================
 
     else if (player.class === "Mage") {
 
         damage =
             Math.max(
                 1,
-                player.magic * 2 - currentEnemy.defense
+                player.magic * 2 -
+                currentEnemy.defense
             );
 
     }
 
-
-    // =========================
-    // ROGUE
-    // =========================
 
     else if (player.class === "Rogue") {
 
         damage =
             Math.max(
                 1,
-                player.attack + player.speed - currentEnemy.defense
+                player.attack +
+                player.speed -
+                currentEnemy.defense
             );
 
-    }
+        if (Math.random() < 0.35) {
 
+            damage *= 2;
 
-    // Rogue has a chance for extra damage
-
-    if (player.class === "Rogue" && Math.random() < 0.35) {
-
-        damage *= 2;
-
-        addBattleLog(
-            "Shadow Strike lands a critical hit!"
-        );
+            addBattleLog(
+                "Shadow Strike lands a critical hit!"
+            );
+        }
     }
 
 
@@ -577,24 +600,18 @@ function useAbility() {
         currentEnemy.currentHealth = 0;
     }
 
-
     addBattleLog(
         `${player.name} uses ${abilityName} for ${damage} damage!`
     );
-
-
-    // Put ability on cooldown
 
     abilityCooldown = 2;
 
     updateBattleScreen();
     updateAbilityButton();
 
-
     if (checkEnemyDefeated()) {
         return;
     }
-
 
     enemyAttack();
 }
@@ -616,9 +633,7 @@ function checkEnemyDefeated() {
 
         setTimeout(() => {
 
-            alert(
-                `Victory! You defeated the ${currentEnemy.name}!`
-            );
+            awardXP(currentEnemy.xp);
 
             showScreen("game-screen");
 
@@ -628,6 +643,55 @@ function checkEnemyDefeated() {
     }
 
     return false;
+}
+
+
+// =========================
+// XP SYSTEM
+// =========================
+
+function awardXP(amount) {
+
+    player.xp += amount;
+
+    alert(
+        `Victory!\n\nYou defeated the ${currentEnemy.name} and earned ${amount} XP!`
+    );
+
+    checkLevelUp();
+}
+
+
+function checkLevelUp() {
+
+    while (player.xp >= player.xpToNextLevel) {
+
+        player.xp -= player.xpToNextLevel;
+
+        player.level++;
+
+        player.xpToNextLevel =
+            Math.floor(player.xpToNextLevel * 1.25);
+
+        player.maxHealth += 10;
+        player.currentHealth += 10;
+
+        player.attack += 2;
+        player.defense += 2;
+        player.speed += 1;
+        player.magic += 2;
+
+
+        alert(
+            `LEVEL UP!\n\n` +
+            `${player.name} reached Level ${player.level}!\n\n` +
+            `+10 Health\n` +
+            `+2 Attack\n` +
+            `+2 Defense\n` +
+            `+1 Speed\n` +
+            `+2 Magic`
+        );
+    }
 }
 
 
@@ -644,7 +708,8 @@ function enemyAttack() {
     const damage =
         Math.max(
             1,
-            currentEnemy.attack - player.defense
+            currentEnemy.attack -
+            player.defense
         );
 
     player.currentHealth -= damage;
@@ -705,7 +770,8 @@ function updateAbilityButton() {
     }
 
     const abilityName =
-        classes[player.class]?.ability || "Ability";
+        classes[player.class]?.ability ||
+        "Ability";
 
     if (abilityCooldown > 0) {
 
@@ -734,7 +800,7 @@ function updateBattleScreen() {
         player.name;
 
     document.getElementById("battle-player-class").textContent =
-        player.class;
+        `${player.class} - Level ${player.level}`;
 
     document.getElementById("battle-enemy-name").textContent =
         currentEnemy.name;
@@ -747,10 +813,12 @@ function updateBattleScreen() {
 
 
     const playerHealthPercent =
-        (player.currentHealth / player.maxHealth) * 100;
+        (player.currentHealth /
+            player.maxHealth) * 100;
 
     const enemyHealthPercent =
-        (currentEnemy.currentHealth / currentEnemy.health) * 100;
+        (currentEnemy.currentHealth /
+            currentEnemy.health) * 100;
 
 
     document.getElementById("player-health-bar").style.width =
@@ -770,7 +838,8 @@ function addBattleLog(message) {
     const battleLog =
         document.getElementById("battle-log-text");
 
-    battleLog.innerHTML += `<p>${message}</p>`;
+    battleLog.innerHTML +=
+        `<p>${message}</p>`;
 
     battleLog.scrollTop =
         battleLog.scrollHeight;
