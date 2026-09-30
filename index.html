@@ -239,105 +239,110 @@
         </section>
 
 
-        <!-- ========================= -->
-        <!-- BATTLE SCREEN -->
-        <!-- ========================= -->
+       <!-- ========================= -->
+<!-- BATTLE SCREEN -->
+<!-- ========================= -->
 
-        <section id="battle-screen" class="screen">
+<section id="battle-screen" class="screen">
 
-            <div class="battle-container">
+    <div class="battle-container">
 
-                <h1>⚔️ Battle</h1>
+        <h1>⚔️ Battle</h1>
 
-                <div class="battle-fighters">
+        <div class="battle-fighters">
 
-                    <!-- PLAYER -->
+            <!-- PLAYER -->
 
-                    <div class="fighter">
+            <div class="fighter">
 
-                        <h2 id="battle-player-name">
-                            Player
-                        </h2>
+                <h2 id="battle-player-name">
+                    Player
+                </h2>
 
-                        <div class="health-bar">
-                            <div
-                                id="player-health-bar"
-                                class="health-fill"
-                            ></div>
-                        </div>
+                <p id="battle-player-class"></p>
 
-                        <p>
-                            ❤️
-                            <span id="battle-player-health"></span>
-                        </p>
-
-                    </div>
-
-
-                    <div class="vs">
-                        VS
-                    </div>
-
-
-                    <!-- ENEMY -->
-
-                    <div class="fighter">
-
-                        <h2 id="battle-enemy-name">
-                            Enemy
-                        </h2>
-
-                        <div class="health-bar">
-                            <div
-                                id="enemy-health-bar"
-                                class="health-fill"
-                            ></div>
-                        </div>
-
-                        <p>
-                            ❤️
-                            <span id="battle-enemy-health"></span>
-                        </p>
-
-                    </div>
-
+                <div class="health-bar">
+                    <div
+                        id="player-health-bar"
+                        class="health-fill"
+                    ></div>
                 </div>
 
-
-                <!-- BATTLE LOG -->
-
-                <div class="battle-log">
-
-                    <h3>Battle Log</h3>
-
-                    <div id="battle-log-text">
-                        A battle has begun!
-                    </div>
-
-                </div>
-
-
-                <!-- ACTIONS -->
-
-                <div class="battle-actions">
-
-                    <button onclick="playerAttack()">
-                        ⚔️ Attack
-                    </button>
-
-                    <button onclick="showComingSoon('Abilities')">
-                        ✨ Abilities
-                    </button>
-
-                    <button onclick="fleeBattle()">
-                        🏃 Flee
-                    </button>
-
-                </div>
+                <p>
+                    ❤️
+                    <span id="battle-player-health"></span>
+                </p>
 
             </div>
 
-        </section>
+
+            <div class="vs">
+                VS
+            </div>
+
+
+            <!-- ENEMY -->
+
+            <div class="fighter">
+
+                <h2 id="battle-enemy-name">
+                    Enemy
+                </h2>
+
+                <div class="health-bar">
+                    <div
+                        id="enemy-health-bar"
+                        class="health-fill"
+                    ></div>
+                </div>
+
+                <p>
+                    ❤️
+                    <span id="battle-enemy-health"></span>
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- BATTLE LOG -->
+
+        <div class="battle-log">
+
+            <h3>Battle Log</h3>
+
+            <div id="battle-log-text">
+                A battle has begun!
+            </div>
+
+        </div>
+
+
+        <!-- ACTIONS -->
+
+        <div class="battle-actions">
+
+            <button onclick="playerAttack()">
+                ⚔️ Attack
+            </button>
+
+            <button
+                id="ability-button"
+                onclick="useAbility()"
+            >
+                ✨ Ability
+            </button>
+
+            <button onclick="fleeBattle()">
+                🏃 Flee
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
 
 
         <!-- ========================= -->

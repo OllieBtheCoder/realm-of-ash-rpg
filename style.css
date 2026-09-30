@@ -407,3 +407,12 @@ button:active {
     color: #d8b76a;
     margin-top: 0;
 }
+
+/* ========================= */
+/* ABILITY BUTTON */
+/* ========================= */
+
+.battle-actions button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}

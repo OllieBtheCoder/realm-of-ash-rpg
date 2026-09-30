@@ -24,6 +24,7 @@ const classes = {
         defense: 15,
         speed: 8,
         magic: 5,
+        ability: "Power Strike",
         description: "Strong and heavily armored warriors who excel in close combat."
     },
 
@@ -33,6 +34,7 @@ const classes = {
         defense: 9,
         speed: 16,
         magic: 8,
+        ability: "Precise Shot",
         description: "Swift hunters who specialize in ranged attacks and precision."
     },
 
@@ -42,6 +44,7 @@ const classes = {
         defense: 6,
         speed: 12,
         magic: 25,
+        ability: "Arcane Bolt",
         description: "Powerful spellcasters who sacrifice physical strength for magical power."
     },
 
@@ -51,6 +54,7 @@ const classes = {
         defense: 8,
         speed: 20,
         magic: 7,
+        ability: "Shadow Strike",
         description: "Fast and deadly fighters who rely on speed and critical strikes."
     }
 
@@ -139,10 +143,15 @@ const enemies = [
 ];
 
 
-// Current enemy during battle
-
 let currentEnemy = null;
 let battleActive = false;
+
+
+// =========================
+// ABILITY STATE
+// =========================
+
+let abilityCooldown = 0;
 
 
 // =========================
@@ -182,7 +191,9 @@ function updateRacePreview() {
     const race = races[selectedRace];
 
     if (!race) {
-        raceInfo.innerHTML = "Choose a race to see its advantages.";
+        raceInfo.innerHTML =
+            "Choose a race to see its advantages.";
+
         return;
     }
 
@@ -226,16 +237,29 @@ function updateRacePreview() {
 
 function updateClassPreview() {
 
-    const classSelect = document.getElementById("character-class");
-    const raceSelect = document.getElementById("character-race");
+    const classSelect =
+        document.getElementById("character-class");
 
-    const classInfo = document.getElementById("class-info");
+    const raceSelect =
+        document.getElementById("character-race");
 
-    const previewHealth = document.getElementById("preview-health");
-    const previewAttack = document.getElementById("preview-attack");
-    const previewDefense = document.getElementById("preview-defense");
-    const previewSpeed = document.getElementById("preview-speed");
-    const previewMagic = document.getElementById("preview-magic");
+    const classInfo =
+        document.getElementById("class-info");
+
+    const previewHealth =
+        document.getElementById("preview-health");
+
+    const previewAttack =
+        document.getElementById("preview-attack");
+
+    const previewDefense =
+        document.getElementById("preview-defense");
+
+    const previewSpeed =
+        document.getElementById("preview-speed");
+
+    const previewMagic =
+        document.getElementById("preview-magic");
 
     const selectedClass = classSelect.value;
     const selectedRace = raceSelect.value;
@@ -252,6 +276,11 @@ function updateClassPreview() {
 
         <p>
             ${classData.description}
+        </p>
+
+        <p>
+            ✨ Ability:
+            <strong>${classData.ability}</strong>
         </p>
     `;
 
@@ -285,9 +314,14 @@ function updateClassPreview() {
 
 function createCharacter() {
 
-    const nameInput = document.getElementById("character-name");
-    const raceSelect = document.getElementById("character-race");
-    const classSelect = document.getElementById("character-class");
+    const nameInput =
+        document.getElementById("character-name");
+
+    const raceSelect =
+        document.getElementById("character-race");
+
+    const classSelect =
+        document.getElementById("character-class");
 
     const name = nameInput.value.trim();
     const race = raceSelect.value;
@@ -305,14 +339,23 @@ function createCharacter() {
     player.race = race;
     player.class = selectedClass;
 
-    player.health = classData.health + raceData.health;
+    player.health =
+        classData.health + raceData.health;
+
     player.maxHealth = player.health;
     player.currentHealth = player.health;
 
-    player.attack = classData.attack + raceData.attack;
-    player.defense = classData.defense + raceData.defense;
-    player.speed = classData.speed + raceData.speed;
-    player.magic = classData.magic + raceData.magic;
+    player.attack =
+        classData.attack + raceData.attack;
+
+    player.defense =
+        classData.defense + raceData.defense;
+
+    player.speed =
+        classData.speed + raceData.speed;
+
+    player.magic =
+        classData.magic + raceData.magic;
 
     document.getElementById("welcome-message").textContent =
         `Welcome, ${player.name}. Your adventure begins.`;
@@ -366,8 +409,6 @@ function startExploration() {
         return;
     }
 
-    // Pick a random enemy
-
     const randomIndex =
         Math.floor(Math.random() * enemies.length);
 
@@ -375,17 +416,20 @@ function startExploration() {
         ...enemies[randomIndex]
     };
 
-    // Reset enemy health
+    currentEnemy.currentHealth =
+        currentEnemy.health;
 
-    currentEnemy.currentHealth = currentEnemy.health;
+    player.currentHealth =
+        player.maxHealth;
 
-    // Reset player health before battle
-
-    player.currentHealth = player.maxHealth;
+    abilityCooldown = 0;
 
     battleActive = true;
 
     updateBattleScreen();
+    updateAbilityButton();
+
+    document.getElementById("battle-log-text").innerHTML = "";
 
     addBattleLog(
         `A ${currentEnemy.name} appears! Prepare for battle!`
@@ -396,7 +440,7 @@ function startExploration() {
 
 
 // =========================
-// BATTLE
+// NORMAL ATTACK
 // =========================
 
 function playerAttack() {
@@ -405,10 +449,11 @@ function playerAttack() {
         return;
     }
 
-    // Calculate damage
-
     const damage =
-        Math.max(1, player.attack - currentEnemy.defense);
+        Math.max(
+            1,
+            player.attack - currentEnemy.defense
+        );
 
     currentEnemy.currentHealth -= damage;
 
@@ -422,8 +467,144 @@ function playerAttack() {
 
     updateBattleScreen();
 
+    if (checkEnemyDefeated()) {
+        return;
+    }
 
-    // Check if enemy died
+    reduceAbilityCooldown();
+
+    enemyAttack();
+}
+
+
+// =========================
+// CLASS ABILITY
+// =========================
+
+function useAbility() {
+
+    if (!battleActive) {
+        return;
+    }
+
+    if (abilityCooldown > 0) {
+        addBattleLog(
+            `Your ability is on cooldown for ${abilityCooldown} more turn(s).`
+        );
+
+        return;
+    }
+
+    let damage = 0;
+    let abilityName = classes[player.class].ability;
+
+
+    // =========================
+    // WARRIOR
+    // =========================
+
+    if (player.class === "Warrior") {
+
+        damage =
+            Math.max(
+                1,
+                player.attack * 2 - currentEnemy.defense
+            );
+
+    }
+
+
+    // =========================
+    // RANGER
+    // =========================
+
+    else if (player.class === "Ranger") {
+
+        damage =
+            Math.max(
+                1,
+                player.attack + player.speed - currentEnemy.defense
+            );
+
+    }
+
+
+    // =========================
+    // MAGE
+    // =========================
+
+    else if (player.class === "Mage") {
+
+        damage =
+            Math.max(
+                1,
+                player.magic * 2 - currentEnemy.defense
+            );
+
+    }
+
+
+    // =========================
+    // ROGUE
+    // =========================
+
+    else if (player.class === "Rogue") {
+
+        damage =
+            Math.max(
+                1,
+                player.attack + player.speed - currentEnemy.defense
+            );
+
+    }
+
+
+    // Rogue has a chance for extra damage
+
+    if (player.class === "Rogue" && Math.random() < 0.35) {
+
+        damage *= 2;
+
+        addBattleLog(
+            "Shadow Strike lands a critical hit!"
+        );
+    }
+
+
+    currentEnemy.currentHealth -= damage;
+
+    if (currentEnemy.currentHealth < 0) {
+        currentEnemy.currentHealth = 0;
+    }
+
+
+    addBattleLog(
+        `${player.name} uses ${abilityName} for ${damage} damage!`
+    );
+
+
+    // Put ability on cooldown
+
+    abilityCooldown = 2;
+
+    updateBattleScreen();
+    updateAbilityButton();
+
+
+    if (checkEnemyDefeated()) {
+        return;
+    }
+
+
+    enemyAttack();
+}
+
+
+// =========================
+// ENEMY DEFEATED
+// =========================
+
+function checkEnemyDefeated() {
 
     if (currentEnemy.currentHealth <= 0) {
 
@@ -435,21 +616,24 @@ function playerAttack() {
 
         setTimeout(() => {
 
-            alert(`Victory! You defeated the ${currentEnemy.name}!`);
+            alert(
+                `Victory! You defeated the ${currentEnemy.name}!`
+            );
 
             showScreen("game-screen");
 
         }, 300);
 
-        return;
+        return true;
     }
 
-
-    // Enemy gets to attack
-
-    enemyAttack();
+    return false;
 }
 
+
+// =========================
+// ENEMY ATTACK
+// =========================
 
 function enemyAttack() {
 
@@ -458,7 +642,10 @@ function enemyAttack() {
     }
 
     const damage =
-        Math.max(1, currentEnemy.attack - player.defense);
+        Math.max(
+            1,
+            currentEnemy.attack - player.defense
+        );
 
     player.currentHealth -= damage;
 
@@ -473,8 +660,6 @@ function enemyAttack() {
     updateBattleScreen();
 
 
-    // Check if player died
-
     if (player.currentHealth <= 0) {
 
         battleActive = false;
@@ -485,11 +670,56 @@ function enemyAttack() {
 
         setTimeout(() => {
 
-            alert("Defeat! Your adventure ends here.");
+            alert(
+                "Defeat! Your adventure ends here."
+            );
 
             returnToTitle();
 
         }, 300);
+    }
+}
+
+
+// =========================
+// ABILITY COOLDOWN
+// =========================
+
+function reduceAbilityCooldown() {
+
+    if (abilityCooldown > 0) {
+        abilityCooldown--;
+    }
+
+    updateAbilityButton();
+}
+
+
+function updateAbilityButton() {
+
+    const button =
+        document.getElementById("ability-button");
+
+    if (!button) {
+        return;
+    }
+
+    const abilityName =
+        classes[player.class]?.ability || "Ability";
+
+    if (abilityCooldown > 0) {
+
+        button.textContent =
+            `✨ ${abilityName} (${abilityCooldown})`;
+
+        button.disabled = true;
+
+    } else {
+
+        button.textContent =
+            `✨ ${abilityName}`;
+
+        button.disabled = false;
     }
 }
 
@@ -502,6 +732,9 @@ function updateBattleScreen() {
 
     document.getElementById("battle-player-name").textContent =
         player.name;
+
+    document.getElementById("battle-player-class").textContent =
+        player.class;
 
     document.getElementById("battle-enemy-name").textContent =
         currentEnemy.name;
@@ -539,7 +772,8 @@ function addBattleLog(message) {
 
     battleLog.innerHTML += `<p>${message}</p>`;
 
-    battleLog.scrollTop = battleLog.scrollHeight;
+    battleLog.scrollTop =
+        battleLog.scrollHeight;
 }
 
 
