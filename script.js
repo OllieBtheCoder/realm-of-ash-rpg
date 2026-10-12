@@ -1,3 +1,46 @@
+
+function showNotification(message, title = "Realm of Ash") {
+    const overlay = document.getElementById(
+        "notification-overlay"
+    );
+
+    document.getElementById(
+        "notification-title"
+    ).textContent = title;
+
+    document.getElementById(
+        "notification-message"
+    ).textContent = message;
+
+    overlay.classList.remove("hidden");
+
+    document.getElementById(
+        "notification-close"
+    ).focus();
+}
+
+function closeNotification() {
+    document.getElementById(
+        "notification-overlay"
+    ).classList.add("hidden");
+}
+
+document.getElementById("notification-close").addEventListener(
+    "click",
+    closeNotification
+);
+
+document.getElementById("notification-overlay").addEventListener(
+    "click",
+    function (event) {
+        if (event.target.id === "notification-overlay") {
+            closeNotification();
+        }
+    }
+
+    
+);
+
 let player = {
     name: "",
     race: "",
@@ -364,10 +407,6 @@ function createCharacter() {
     const race = document.getElementById("character-race").value;
     const selectedClass = document.getElementById("character-class").value;
 
-    if (!name) {
-        alert("Please enter a character name.");
-        return;
-    }
 
     const classData = classes[selectedClass];
     const raceData = races[race];
@@ -492,7 +531,10 @@ function startBossBattle() {
             bosses.find(boss => boss.name === "The Ashen Dragon")
         );
     } else {
-        alert("You have defeated every boss! You are a legend!");
+        showNotification(
+    "You have defeated every boss! You are a legend!",
+    "👑 Legendary Champion"
+);
         return;
     }
 
@@ -646,6 +688,10 @@ function checkEnemyDefeated() {
                 addBattleLog(
                     "🐉 The Ashen Dragon has been unlocked!"
                 );
+                showNotification(
+    "The Fallen King is defeated!",
+    "🏆 Legendary Victory!"
+);
             }
         }
 
@@ -691,8 +737,9 @@ function checkEnemyDefeated() {
 function awardXP(amount) {
     player.xp += amount;
 
-    alert(
-        `Victory!\n\nYou defeated the ${currentEnemy.name} and earned ${amount} XP!`
+    showNotification(
+        `Victory!\n\nYou defeated the ${currentEnemy.name} and earned ${amount} XP!`,
+        "🏆 Victory!"
     );
 
     checkLevelUp();
@@ -725,14 +772,15 @@ function checkLevelUp() {
         player.speed += 1;
         player.magic += 2;
 
-        alert(
+        showNotification(
             `LEVEL UP!\n\n` +
             `${player.name} reached Level ${player.level}!\n\n` +
             `+10 Health\n` +
             `+2 Attack\n` +
             `+2 Defense\n` +
             `+1 Speed\n` +
-            `+2 Magic`
+            `+2 Magic`,
+            "⭐ Level Up!"
         );
     }
 }
@@ -767,7 +815,11 @@ function enemyAttack() {
         addBattleLog(`${player.name} has been defeated.`);
 
         setTimeout(() => {
-            alert("Defeat! Your adventure ends here.");
+            
+showNotification(
+    "Defeat! Your adventure ends here.",
+    "💀 You Have Fallen"
+);
             returnToTitle();
         }, 300);
     }
@@ -1072,3 +1124,8 @@ document
     .addEventListener("change", function () {
         updateClassPreview();
     });
+
+    showNotification(
+    "The ancient gates have opened. Your adventure awaits!",
+    "⚔️ A Message from the Realm"
+);

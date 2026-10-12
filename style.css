@@ -614,3 +614,87 @@ button:active {
     box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
     transition: width 0.35s ease;
 }
+
+
+/* =========================
+   FANTASY NOTIFICATIONS
+========================= */
+
+.notification-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+}
+
+.notification-overlay.hidden {
+    display: none;
+}
+
+.notification-panel {
+    width: 100%;
+    max-width: 440px;
+    padding: 30px;
+    text-align: center;
+    color: #f5e6c8;
+    background: linear-gradient(
+        145deg,
+        #29201b,
+        #100e0d
+    );
+    border: 2px solid #c49a43;
+    border-radius: 12px;
+    box-shadow:
+        0 0 20px rgba(196, 154, 67, 0.25),
+        0 0 60px rgba(0, 0, 0, 0.7);
+    animation: notification-appear 0.2s ease-out;
+}
+
+.notification-panel h2 {
+    margin-top: 0;
+    color: #e9bd59;
+    text-shadow: 0 0 12px rgba(233, 189, 89, 0.3);
+}
+
+.notification-panel p {
+    line-height: 1.7;
+    white-space: pre-line;
+    margin: 20px 0;
+}
+
+.notification-panel button {
+    min-width: 140px;
+    padding: 12px 24px;
+    color: #1a1208;
+    font-weight: bold;
+    background: linear-gradient(
+        135deg,
+        #f0cf75,
+        #bd8b2d
+    );
+    border: 1px solid #ffe6a0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.notification-panel button:hover {
+    filter: brightness(1.15);
+    transform: translateY(-1px);
+}
+
+@keyframes notification-appear {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.97);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
