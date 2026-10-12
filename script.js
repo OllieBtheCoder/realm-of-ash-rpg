@@ -142,6 +142,39 @@ const enemies = [
             "Armor of the Fallen King"
         ]
     }
+    
+];
+
+
+const bosses = [
+    {
+        name: "The Fallen King",
+        health: 250,
+        attack: 28,
+        defense: 18,
+        xp: 150,
+        isBoss: true,
+        loot: [
+            "Iron Blade",
+            "Guardian's Plate",
+            "Void Reaver",
+            "Armor of the Fallen King"
+        ]
+    },
+    {
+        name: "The Ashen Dragon",
+        health: 350,
+        attack: 35,
+        defense: 22,
+        xp: 250,
+        isBoss: true,
+        loot: [
+            "Stormbringer",
+            "Dragonscale Armor",
+            "Void Reaver",
+            "Armor of the Fallen King"
+        ]
+    }
 ];
 
 let currentEnemy = null;
@@ -430,6 +463,39 @@ function startExploration() {
 
     addBattleLog(
         `A ${currentEnemy.name} appears! Prepare for battle!`
+    );
+
+    showScreen("battle-screen");
+}
+
+
+function startBossBattle() {
+    if (!player.name) {
+        alert("Create a character first!");
+        return;
+    }
+
+    const randomIndex = Math.floor(
+        Math.random() * bosses.length
+    );
+
+    currentEnemy = {
+        ...bosses[randomIndex],
+        currentHealth: bosses[randomIndex].health
+    };
+
+    player.currentHealth = player.maxHealth;
+
+    abilityCooldown = 0;
+    battleActive = true;
+
+    updateBattleScreen();
+    updateAbilityButton();
+
+    document.getElementById("battle-log-text").innerHTML = "";
+
+    addBattleLog(
+        `⚠️ BOSS ENCOUNTER! ${currentEnemy.name} appears!`
     );
 
     showScreen("battle-screen");
@@ -749,10 +815,15 @@ function showInventory() {
 
 function awardLoot() {
     // Keep the existing 70% drop chance.
-    if (Math.random() >= 0.70) {
-        alert("No loot this time. Keep exploring!");
-        return;
-    }
+
+const isBoss = currentEnemy.isBoss === true;
+
+// Normal enemies have a 70% drop chance.
+// Bosses always drop an item.
+if (!isBoss && Math.random() >= 0.70) {
+    alert("No loot this time. Keep exploring!");
+    return;
+}
 
     // Get only the items this enemy can drop.
     const possibleLoot = lootTable.filter(item =>
