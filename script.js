@@ -100,34 +100,39 @@ const races = {
 // ENEMY DATA
 // =========================
 
+
 const enemies = [
     {
         name: "Goblin",
         health: 50,
         attack: 10,
         defense: 5,
-        xp: 20
+        xp: 20,
+        loot: ["Rusty Sword", "Leather Armor"]
     },
     {
         name: "Wolf",
         health: 40,
         attack: 12,
         defense: 3,
-        xp: 25
+        xp: 25,
+        loot: ["Hunter's Bow", "Leather Armor"]
     },
     {
         name: "Orc",
         health: 80,
         attack: 15,
         defense: 10,
-        xp: 40
+        xp: 40,
+        loot: ["Rusty Sword", "Hunter's Bow", "Iron Blade", "Iron Chestplate"]
     },
     {
         name: "Troll",
         health: 120,
         attack: 20,
         defense: 15,
-        xp: 60
+        xp: 60,
+        loot: ["Iron Blade", "Iron Chestplate", "Guardian's Plate"]
     }
 ];
 
@@ -704,20 +709,36 @@ function showInventory() {
 // LOOT DROPS
 // =========================
 
+
 function awardLoot() {
-    // Enemies have a 70% chance to drop an item.
+    // Keep the existing 70% drop chance.
     if (Math.random() >= 0.70) {
         alert("No loot this time. Keep exploring!");
         return;
     }
 
+    // Get only the items this enemy can drop.
+    const possibleLoot = lootTable.filter(item =>
+        currentEnemy.loot.includes(item.name)
+    );
+
+    // Safety check in case an enemy has no valid loot.
+    if (possibleLoot.length === 0) {
+        alert("This enemy has no loot available.");
+        return;
+    }
+
+    // Randomly select an item from this enemy's loot pool.
+    const randomIndex = Math.floor(
+        Math.random() * possibleLoot.length
+    );
+
     const item = {
-        ...lootTable[
-            Math.floor(Math.random() * lootTable.length)
-        ],
+        ...possibleLoot[randomIndex],
         id: `${Date.now()}-${Math.floor(Math.random() * 100000)}`
     };
 
+    // Add the item to the player's inventory.
     inventory.push(item);
 
     alert(
