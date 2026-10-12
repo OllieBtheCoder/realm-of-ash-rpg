@@ -624,49 +624,58 @@ function useAbility() {
 // =========================
 
 
+
 function checkEnemyDefeated() {
     if (currentEnemy.currentHealth <= 0) {
         battleActive = false;
 
+        const defeatedEnemy = currentEnemy;
+        const xpEarned = defeatedEnemy.xp;
+
         addBattleLog(
-            `The ${currentEnemy.name} has been defeated!`
+            `The ${defeatedEnemy.name} has been defeated!`
         );
 
-        // Record boss victories and unlock progression.
-        if (currentEnemy.isBoss === true) {
-            if (!defeatedBosses.includes(currentEnemy.name)) {
-                defeatedBosses.push(currentEnemy.name);
+        // Record boss victories.
+        if (defeatedEnemy.isBoss === true) {
+            if (!defeatedBosses.includes(defeatedEnemy.name)) {
+                defeatedBosses.push(defeatedEnemy.name);
             }
 
-            if (currentEnemy.name === "The Fallen King") {
-                addBattleLog(
-                    "🏆 The Fallen King has fallen!"
-                );
+            if (defeatedEnemy.name === "The Fallen King") {
                 addBattleLog(
                     "🐉 The Ashen Dragon has been unlocked!"
-                );
-
-                alert(
-                    "VICTORY! The Fallen King is defeated!\n\n" +
-                    "The Ashen Dragon has been unlocked!"
-                );
-            } else if (currentEnemy.name === "The Ashen Dragon") {
-                addBattleLog(
-                    "🏆 You have defeated the final boss!"
-                );
-
-                alert(
-                    "LEGENDARY VICTORY!\n\n" +
-                    "You have defeated The Ashen Dragon " +
-                    "and conquered Realm of Ash!"
                 );
             }
         }
 
         setTimeout(() => {
-            awardXP(currentEnemy.xp);
-            awardLoot();
-            showScreen("game-screen");
+            awardXP(xpEarned);
+            const loot = awardLoot();
+
+            // Set up the victory screen.
+            document.getElementById("victory-title").textContent =
+                defeatedEnemy.isBoss ? "🏆 BOSS DEFEATED!" : "⚔️ Victory!";
+
+            document.getElementById("victory-enemy-name").textContent =
+                defeatedEnemy.name;
+
+            document.getElementById("victory-message").textContent =
+                defeatedEnemy.name === "The Ashen Dragon"
+                    ? "You have conquered Realm of Ash!"
+                    : defeatedEnemy.name === "The Fallen King"
+                        ? "The kingdom is one step closer to freedom!"
+                        : `${defeatedEnemy.name} can no longer threaten you!`;
+
+            document.getElementById("victory-xp").textContent =
+                xpEarned;
+
+            document.getElementById("victory-loot").textContent =
+                loot
+                    ? `🎁 Loot Received: ${loot.name} (${loot.rarity})`
+                    : "No loot received this time.";
+
+            showScreen("victory-screen");
         }, 300);
 
         return true;
@@ -879,30 +888,27 @@ function showInventory() {
 // =========================
 
 
+
 function awardLoot() {
-    // Keep the existing 70% drop chance.
+    const isBoss = currentEnemy.isBoss === true;
 
-const isBoss = currentEnemy.isBoss === true;
+    // Normal enemies have a 70% drop chance.
+    // Bosses always drop an item.
+    if (!isBoss && Math.random() >= 0.70) {
+        addBattleLog("No loot this time. Keep exploring!");
+        return null;
+    }
 
-// Normal enemies have a 70% drop chance.
-// Bosses always drop an item.
-if (!isBoss && Math.random() >= 0.70) {
-    alert("No loot this time. Keep exploring!");
-    return;
-}
-
-    // Get only the items this enemy can drop.
+    // Only choose from this enemy's loot pool.
     const possibleLoot = lootTable.filter(item =>
         currentEnemy.loot.includes(item.name)
     );
 
-    // Safety check in case an enemy has no valid loot.
     if (possibleLoot.length === 0) {
-        alert("This enemy has no loot available.");
-        return;
+        addBattleLog("This enemy has no loot available.");
+        return null;
     }
 
-    // Randomly select an item from this enemy's loot pool.
     const randomIndex = Math.floor(
         Math.random() * possibleLoot.length
     );
@@ -912,12 +918,13 @@ if (!isBoss && Math.random() >= 0.70) {
         id: `${Date.now()}-${Math.floor(Math.random() * 100000)}`
     };
 
-    // Add the item to the player's inventory.
     inventory.push(item);
 
-    alert(
-        `Loot found! You received: ${item.name} (${item.rarity}).`
+    addBattleLog(
+        `🎁 Loot found: ${item.name} (${item.rarity})!`
     );
+
+    return item;
 }
 
 // =========================
