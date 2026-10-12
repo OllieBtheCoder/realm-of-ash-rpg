@@ -166,7 +166,7 @@
                         ⚔️ Character
                     </button>
 
-                    <button onclick="showComingSoon('Inventory')">
+                    <button onclick="showInventory()">
                         🎒 Inventory
                     </button>
 
@@ -260,6 +260,38 @@
 
 </section>
 
+<!-- ========================= -->
+<!-- INVENTORY SCREEN -->
+<!-- ========================= -->
+
+<section id="inventory-screen" class="screen">
+
+    <div class="panel">
+
+        <h2>🎒 Inventory</h2>
+
+        <h3>Equipped Items</h3>
+
+        <div id="equipped-items">
+            <p>Weapon: None equipped</p>
+            <p>Armor: None equipped</p>
+        </div>
+
+        <hr>
+
+        <h3>Collected Loot</h3>
+
+        <div id="inventory-items">
+            <p>Your inventory is empty.</p>
+        </div>
+
+        <button onclick="returnToGame()">
+            Back to Adventure
+        </button>
+
+    </div>
+
+</section>
 
        <!-- ========================= -->
 <!-- BATTLE SCREEN -->

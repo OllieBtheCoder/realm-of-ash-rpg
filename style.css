@@ -455,3 +455,53 @@ button:active {
     margin-top: 8px;
     font-size: 0.9rem;
 }
+
+/* ========================= */
+/* INVENTORY SYSTEM */
+/* ========================= */
+
+.inventory-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    margin: 12px 0;
+    border: 1px solid #8c6b3e;
+    border-radius: 8px;
+    background: rgba(20, 15, 12, 0.8);
+}
+
+.inventory-item p {
+    margin: 6px 0 0;
+    color: #d4c3a1;
+    font-size: 0.9rem;
+}
+
+.inventory-item button {
+    flex-shrink: 0;
+}
+
+#equipped-items {
+    margin: 15px 0;
+    padding: 12px;
+    background: rgba(140, 107, 62, 0.12);
+    border-radius: 8px;
+}
+
+#inventory-items {
+    margin: 15px 0;
+}
+
+#inventory-items > p {
+    color: #d4c3a1;
+    text-align: center;
+    padding: 15px 0;
+}
+
+@media (max-width: 480px) {
+    .inventory-item {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

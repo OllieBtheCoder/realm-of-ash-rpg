@@ -2,28 +2,23 @@ let player = {
     name: "",
     race: "",
     class: "",
-
     health: 0,
     maxHealth: 0,
     currentHealth: 0,
-
     attack: 0,
     defense: 0,
     speed: 0,
     magic: 0,
-
     level: 1,
     xp: 0,
     xpToNextLevel: 100
 };
-
 
 // =========================
 // CLASS DATA
 // =========================
 
 const classes = {
-
     Warrior: {
         health: 120,
         attack: 18,
@@ -33,7 +28,6 @@ const classes = {
         ability: "Power Strike",
         description: "Strong and heavily armored warriors who excel in close combat."
     },
-
     Ranger: {
         health: 100,
         attack: 15,
@@ -43,7 +37,6 @@ const classes = {
         ability: "Precise Shot",
         description: "Swift hunters who specialize in ranged attacks and precision."
     },
-
     Mage: {
         health: 80,
         attack: 8,
@@ -53,7 +46,6 @@ const classes = {
         ability: "Arcane Bolt",
         description: "Powerful spellcasters who sacrifice physical strength for magical power."
     },
-
     Rogue: {
         health: 95,
         attack: 17,
@@ -63,16 +55,13 @@ const classes = {
         ability: "Shadow Strike",
         description: "Fast and deadly fighters who rely on speed and critical strikes."
     }
-
 };
-
 
 // =========================
 // RACE DATA
 // =========================
 
 const races = {
-
     Human: {
         health: 0,
         attack: 2,
@@ -81,7 +70,6 @@ const races = {
         magic: 0,
         description: "Adaptable and balanced, Humans are capable in almost every situation."
     },
-
     Elf: {
         health: 0,
         attack: 0,
@@ -90,7 +78,6 @@ const races = {
         magic: 3,
         description: "Swift and naturally magical, Elves excel at speed and spellcasting."
     },
-
     Dwarf: {
         health: 15,
         attack: 0,
@@ -99,7 +86,6 @@ const races = {
         magic: 0,
         description: "Tough and resilient, Dwarves are difficult to bring down."
     },
-
     Orc: {
         health: 5,
         attack: 6,
@@ -108,16 +94,13 @@ const races = {
         magic: 0,
         description: "Powerful warriors who rely on strength and raw physical power."
     }
-
 };
-
 
 // =========================
 // ENEMY DATA
 // =========================
 
 const enemies = [
-
     {
         name: "Goblin",
         health: 50,
@@ -125,7 +108,6 @@ const enemies = [
         defense: 5,
         xp: 20
     },
-
     {
         name: "Wolf",
         health: 40,
@@ -133,7 +115,6 @@ const enemies = [
         defense: 3,
         xp: 25
     },
-
     {
         name: "Orc",
         health: 80,
@@ -141,7 +122,6 @@ const enemies = [
         defense: 10,
         xp: 40
     },
-
     {
         name: "Troll",
         health: 120,
@@ -149,21 +129,80 @@ const enemies = [
         defense: 15,
         xp: 60
     }
-
 ];
-
 
 let currentEnemy = null;
 let battleActive = false;
 let abilityCooldown = 0;
 
+// =========================
+// INVENTORY AND EQUIPMENT
+// =========================
+
+let inventory = [];
+
+let equipped = {
+    weapon: null,
+    armor: null
+};
+
+const lootTable = [
+    {
+        name: "Rusty Sword",
+        type: "weapon",
+        attackBonus: 3,
+        defenseBonus: 0,
+        rarity: "Common"
+    },
+    {
+        name: "Hunter's Bow",
+        type: "weapon",
+        attackBonus: 4,
+        defenseBonus: 0,
+        rarity: "Uncommon"
+    },
+    {
+        name: "Apprentice's Staff",
+        type: "weapon",
+        attackBonus: 2,
+        defenseBonus: 0,
+        rarity: "Common"
+    },
+    {
+        name: "Iron Blade",
+        type: "weapon",
+        attackBonus: 6,
+        defenseBonus: 0,
+        rarity: "Rare"
+    },
+    {
+        name: "Leather Armor",
+        type: "armor",
+        attackBonus: 0,
+        defenseBonus: 2,
+        rarity: "Common"
+    },
+    {
+        name: "Iron Chestplate",
+        type: "armor",
+        attackBonus: 0,
+        defenseBonus: 4,
+        rarity: "Uncommon"
+    },
+    {
+        name: "Guardian's Plate",
+        type: "armor",
+        attackBonus: 0,
+        defenseBonus: 6,
+        rarity: "Rare"
+    }
+];
 
 // =========================
 // SCREEN MANAGEMENT
 // =========================
 
 function showScreen(screenId) {
-
     document.querySelectorAll(".screen").forEach(screen => {
         screen.classList.remove("active");
     });
@@ -171,71 +210,38 @@ function showScreen(screenId) {
     document.getElementById(screenId).classList.add("active");
 }
 
-
 // =========================
 // CHARACTER CREATION
 // =========================
 
 function showCharacterCreation() {
-
     showScreen("character-screen");
-
     updateRacePreview();
     updateClassPreview();
 }
 
-
 function updateRacePreview() {
-
-    const raceSelect =
-        document.getElementById("character-race");
-
-    const raceInfo =
-        document.getElementById("race-info");
-
-    const selectedRace =
-        raceSelect.value;
-
-    const race =
-        races[selectedRace];
+    const raceSelect = document.getElementById("character-race");
+    const raceInfo = document.getElementById("race-info");
+    const selectedRace = raceSelect.value;
+    const race = races[selectedRace];
 
     if (!race) {
-
-        raceInfo.innerHTML =
-            "Choose a race to see its advantages.";
-
+        raceInfo.innerHTML = "Choose a race to see its advantages.";
         return;
     }
 
     let bonuses = [];
 
-    if (race.health > 0) {
-        bonuses.push(`+${race.health} Health`);
-    }
-
-    if (race.attack > 0) {
-        bonuses.push(`+${race.attack} Attack`);
-    }
-
-    if (race.defense > 0) {
-        bonuses.push(`+${race.defense} Defense`);
-    }
-
-    if (race.speed > 0) {
-        bonuses.push(`+${race.speed} Speed`);
-    }
-
-    if (race.magic > 0) {
-        bonuses.push(`+${race.magic} Magic`);
-    }
+    if (race.health > 0) bonuses.push(`+${race.health} Health`);
+    if (race.attack > 0) bonuses.push(`+${race.attack} Attack`);
+    if (race.defense > 0) bonuses.push(`+${race.defense} Defense`);
+    if (race.speed > 0) bonuses.push(`+${race.speed} Speed`);
+    if (race.magic > 0) bonuses.push(`+${race.magic} Magic`);
 
     raceInfo.innerHTML = `
         <strong>${selectedRace}</strong>
-
-        <p>
-            ${race.description}
-        </p>
-
+        <p>${race.description}</p>
         <span class="race-bonus">
             Racial Bonuses: ${bonuses.join(" • ")}
         </span>
@@ -244,150 +250,73 @@ function updateRacePreview() {
     updateClassPreview();
 }
 
-
 function updateClassPreview() {
+    const selectedClass = document.getElementById("character-class").value;
+    const selectedRace = document.getElementById("character-race").value;
 
-    const classSelect =
-        document.getElementById("character-class");
+    const classData = classes[selectedClass];
+    const raceData = races[selectedRace];
 
-    const raceSelect =
-        document.getElementById("character-race");
+    if (!classData) return;
 
-    const classInfo =
-        document.getElementById("class-info");
-
-    const previewHealth =
-        document.getElementById("preview-health");
-
-    const previewAttack =
-        document.getElementById("preview-attack");
-
-    const previewDefense =
-        document.getElementById("preview-defense");
-
-    const previewSpeed =
-        document.getElementById("preview-speed");
-
-    const previewMagic =
-        document.getElementById("preview-magic");
-
-    const selectedClass =
-        classSelect.value;
-
-    const selectedRace =
-        raceSelect.value;
-
-    const classData =
-        classes[selectedClass];
-
-    const raceData =
-        races[selectedRace];
-
-    if (!classData) {
-        return;
-    }
-
-    classInfo.innerHTML = `
+    document.getElementById("class-info").innerHTML = `
         <h3>${selectedClass}</h3>
-
-        <p>
-            ${classData.description}
-        </p>
-
-        <p>
-            ✨ Ability:
-            <strong>${classData.ability}</strong>
-        </p>
+        <p>${classData.description}</p>
+        <p>✨ Ability: <strong>${classData.ability}</strong></p>
     `;
 
-    let health = classData.health;
-    let attack = classData.attack;
-    let defense = classData.defense;
-    let speed = classData.speed;
-    let magic = classData.magic;
+    document.getElementById("preview-health").textContent =
+        classData.health + raceData.health;
 
-    if (raceData) {
+    document.getElementById("preview-attack").textContent =
+        classData.attack + raceData.attack;
 
-        health += raceData.health;
-        attack += raceData.attack;
-        defense += raceData.defense;
-        speed += raceData.speed;
-        magic += raceData.magic;
-    }
+    document.getElementById("preview-defense").textContent =
+        classData.defense + raceData.defense;
 
-    previewHealth.textContent = health;
-    previewAttack.textContent = attack;
-    previewDefense.textContent = defense;
-    previewSpeed.textContent = speed;
-    previewMagic.textContent = magic;
+    document.getElementById("preview-speed").textContent =
+        classData.speed + raceData.speed;
+
+    document.getElementById("preview-magic").textContent =
+        classData.magic + raceData.magic;
 }
 
-
-// =========================
-// CREATE CHARACTER
-// =========================
-
 function createCharacter() {
-
-    const nameInput =
-        document.getElementById("character-name");
-
-    const raceSelect =
-        document.getElementById("character-race");
-
-    const classSelect =
-        document.getElementById("character-class");
-
-    const name =
-        nameInput.value.trim();
-
-    const race =
-        raceSelect.value;
-
-    const selectedClass =
-        classSelect.value;
+    const name = document.getElementById("character-name").value.trim();
+    const race = document.getElementById("character-race").value;
+    const selectedClass = document.getElementById("character-class").value;
 
     if (!name) {
-
         alert("Please enter a character name.");
-
         return;
     }
 
-    const classData =
-        classes[selectedClass];
-
-    const raceData =
-        races[race];
+    const classData = classes[selectedClass];
+    const raceData = races[race];
 
     player.name = name;
     player.race = race;
     player.class = selectedClass;
 
-    player.health =
-        classData.health + raceData.health;
+    player.health = classData.health + raceData.health;
+    player.maxHealth = player.health;
+    player.currentHealth = player.health;
 
-    player.maxHealth =
-        player.health;
-
-    player.currentHealth =
-        player.health;
-
-    player.attack =
-        classData.attack + raceData.attack;
-
-    player.defense =
-        classData.defense + raceData.defense;
-
-    player.speed =
-        classData.speed + raceData.speed;
-
-    player.magic =
-        classData.magic + raceData.magic;
+    player.attack = classData.attack + raceData.attack;
+    player.defense = classData.defense + raceData.defense;
+    player.speed = classData.speed + raceData.speed;
+    player.magic = classData.magic + raceData.magic;
 
     player.level = 1;
     player.xp = 0;
     player.xpToNextLevel = 100;
+
+    inventory = [];
+
+    equipped = {
+        weapon: null,
+        armor: null
+    };
 
     document.getElementById("welcome-message").textContent =
         `Welcome, ${player.name}. Your adventure begins.`;
@@ -395,13 +324,11 @@ function createCharacter() {
     showScreen("game-screen");
 }
 
-
 // =========================
 // CHARACTER DETAILS
 // =========================
 
 function showCharacter() {
-
     showScreen("character-details-screen");
 
     document.getElementById("character-details-name").textContent =
@@ -434,35 +361,24 @@ function showCharacter() {
     updateXPBar();
 }
 
-
 // =========================
 // EXPLORATION
 // =========================
 
 function startExploration() {
-
     if (!player.name) {
-
         alert("Create a character first!");
-
         return;
     }
 
-    const randomIndex =
-        Math.floor(Math.random() * enemies.length);
+    const randomIndex = Math.floor(Math.random() * enemies.length);
 
-    currentEnemy = {
-        ...enemies[randomIndex]
-    };
+    currentEnemy = { ...enemies[randomIndex] };
+    currentEnemy.currentHealth = currentEnemy.health;
 
-    currentEnemy.currentHealth =
-        currentEnemy.health;
-
-    player.currentHealth =
-        player.maxHealth;
+    player.currentHealth = player.maxHealth;
 
     abilityCooldown = 0;
-
     battleActive = true;
 
     updateBattleScreen();
@@ -477,22 +393,17 @@ function startExploration() {
     showScreen("battle-screen");
 }
 
-
 // =========================
 // NORMAL ATTACK
 // =========================
 
 function playerAttack() {
+    if (!battleActive) return;
 
-    if (!battleActive) {
-        return;
-    }
-
-    const damage =
-        Math.max(
-            1,
-            player.attack - currentEnemy.defense
-        );
+    const damage = Math.max(
+        1,
+        player.attack - currentEnemy.defense
+    );
 
     currentEnemy.currentHealth -= damage;
 
@@ -506,98 +417,55 @@ function playerAttack() {
 
     updateBattleScreen();
 
-    if (checkEnemyDefeated()) {
-        return;
-    }
+    if (checkEnemyDefeated()) return;
 
     reduceAbilityCooldown();
-
     enemyAttack();
 }
-
 
 // =========================
 // CLASS ABILITY
 // =========================
 
 function useAbility() {
-
-    if (!battleActive) {
-        return;
-    }
+    if (!battleActive) return;
 
     if (abilityCooldown > 0) {
-
         addBattleLog(
             `Your ability is on cooldown for ${abilityCooldown} more turn(s).`
         );
-
         return;
     }
 
     let damage = 0;
-
-    const abilityName =
-        classes[player.class].ability;
-
+    const abilityName = classes[player.class].ability;
 
     if (player.class === "Warrior") {
-
-        damage =
-            Math.max(
-                1,
-                player.attack * 2 -
-                currentEnemy.defense
-            );
-
-    }
-
-
-    else if (player.class === "Ranger") {
-
-        damage =
-            Math.max(
-                1,
-                player.attack +
-                player.speed -
-                currentEnemy.defense
-            );
-
-    }
-
-
-    else if (player.class === "Mage") {
-
-        damage =
-            Math.max(
-                1,
-                player.magic * 2 -
-                currentEnemy.defense
-            );
-
-    }
-
-
-    else if (player.class === "Rogue") {
-
-        damage =
-            Math.max(
-                1,
-                player.attack +
-                player.speed -
-                currentEnemy.defense
-            );
+        damage = Math.max(
+            1,
+            player.attack * 2 - currentEnemy.defense
+        );
+    } else if (player.class === "Ranger") {
+        damage = Math.max(
+            1,
+            player.attack + player.speed - currentEnemy.defense
+        );
+    } else if (player.class === "Mage") {
+        damage = Math.max(
+            1,
+            player.magic * 2 - currentEnemy.defense
+        );
+    } else if (player.class === "Rogue") {
+        damage = Math.max(
+            1,
+            player.attack + player.speed - currentEnemy.defense
+        );
 
         if (Math.random() < 0.35) {
-
             damage *= 2;
-
-            addBattleLog(
-                "Shadow Strike lands a critical hit!"
-            );
+            addBattleLog("Shadow Strike lands a critical hit!");
         }
     }
-
 
     currentEnemy.currentHealth -= damage;
 
@@ -614,22 +482,17 @@ function useAbility() {
     updateBattleScreen();
     updateAbilityButton();
 
-    if (checkEnemyDefeated()) {
-        return;
-    }
+    if (checkEnemyDefeated()) return;
 
     enemyAttack();
 }
-
 
 // =========================
 // ENEMY DEFEATED
 // =========================
 
 function checkEnemyDefeated() {
-
     if (currentEnemy.currentHealth <= 0) {
-
         battleActive = false;
 
         addBattleLog(
@@ -637,11 +500,9 @@ function checkEnemyDefeated() {
         );
 
         setTimeout(() => {
-
             awardXP(currentEnemy.xp);
-
+            awardLoot();
             showScreen("game-screen");
-
         }, 300);
 
         return true;
@@ -650,13 +511,11 @@ function checkEnemyDefeated() {
     return false;
 }
 
-
 // =========================
 // XP SYSTEM
 // =========================
 
 function awardXP(amount) {
-
     player.xp += amount;
 
     alert(
@@ -667,7 +526,6 @@ function awardXP(amount) {
 }
 
 function updateXPBar() {
-
     const xpPercentage =
         (player.xp / player.xpToNextLevel) * 100;
 
@@ -678,13 +536,9 @@ function updateXPBar() {
         `${player.xp} / ${player.xpToNextLevel} XP`;
 }
 
-
 function checkLevelUp() {
-
     while (player.xp >= player.xpToNextLevel) {
-
         player.xp -= player.xpToNextLevel;
-
         player.level++;
 
         player.xpToNextLevel =
@@ -698,7 +552,6 @@ function checkLevelUp() {
         player.speed += 1;
         player.magic += 2;
 
-
         alert(
             `LEVEL UP!\n\n` +
             `${player.name} reached Level ${player.level}!\n\n` +
@@ -711,23 +564,17 @@ function checkLevelUp() {
     }
 }
 
-
 // =========================
 // ENEMY ATTACK
 // =========================
 
 function enemyAttack() {
+    if (!battleActive) return;
 
-    if (!battleActive) {
-        return;
-    }
-
-    const damage =
-        Math.max(
-            1,
-            currentEnemy.attack -
-            player.defense
-        );
+    const damage = Math.max(
+        1,
+        currentEnemy.attack - player.defense
+    );
 
     player.currentHealth -= damage;
 
@@ -741,34 +588,23 @@ function enemyAttack() {
 
     updateBattleScreen();
 
-
     if (player.currentHealth <= 0) {
-
         battleActive = false;
 
-        addBattleLog(
-            `${player.name} has been defeated.`
-        );
+        addBattleLog(`${player.name} has been defeated.`);
 
         setTimeout(() => {
-
-            alert(
-                "Defeat! Your adventure ends here."
-            );
-
+            alert("Defeat! Your adventure ends here.");
             returnToTitle();
-
         }, 300);
     }
 }
-
 
 // =========================
 // ABILITY COOLDOWN
 // =========================
 
 function reduceAbilityCooldown() {
-
     if (abilityCooldown > 0) {
         abilityCooldown--;
     }
@@ -776,43 +612,30 @@ function reduceAbilityCooldown() {
     updateAbilityButton();
 }
 
-
 function updateAbilityButton() {
+    const button = document.getElementById("ability-button");
 
-    const button =
-        document.getElementById("ability-button");
-
-    if (!button) {
-        return;
-    }
+    if (!button) return;
 
     const abilityName =
-        classes[player.class]?.ability ||
-        "Ability";
+        classes[player.class]?.ability || "Ability";
 
     if (abilityCooldown > 0) {
-
         button.textContent =
             `✨ ${abilityName} (${abilityCooldown})`;
 
         button.disabled = true;
-
     } else {
-
-        button.textContent =
-            `✨ ${abilityName}`;
-
+        button.textContent = `✨ ${abilityName}`;
         button.disabled = false;
     }
 }
-
 
 // =========================
 // BATTLE UI
 // =========================
 
 function updateBattleScreen() {
-
     document.getElementById("battle-player-name").textContent =
         player.name;
 
@@ -828,15 +651,11 @@ function updateBattleScreen() {
     document.getElementById("battle-enemy-health").textContent =
         `${currentEnemy.currentHealth} / ${currentEnemy.health}`;
 
-
     const playerHealthPercent =
-        (player.currentHealth /
-            player.maxHealth) * 100;
+        (player.currentHealth / player.maxHealth) * 100;
 
     const enemyHealthPercent =
-        (currentEnemy.currentHealth /
-            currentEnemy.health) * 100;
-
+        (currentEnemy.currentHealth / currentEnemy.health) * 100;
 
     document.getElementById("player-health-bar").style.width =
         `${playerHealthPercent}%`;
@@ -845,33 +664,23 @@ function updateBattleScreen() {
         `${enemyHealthPercent}%`;
 }
 
-
 // =========================
 // BATTLE LOG
 // =========================
 
 function addBattleLog(message) {
+    const battleLog = document.getElementById("battle-log-text");
 
-    const battleLog =
-        document.getElementById("battle-log-text");
-
-    battleLog.innerHTML +=
-        `<p>${message}</p>`;
-
-    battleLog.scrollTop =
-        battleLog.scrollHeight;
+    battleLog.innerHTML += `<p>${message}</p>`;
+    battleLog.scrollTop = battleLog.scrollHeight;
 }
-
 
 // =========================
 // FLEE
 // =========================
 
 function fleeBattle() {
-
-    if (!battleActive) {
-        return;
-    }
+    if (!battleActive) return;
 
     battleActive = false;
 
@@ -882,36 +691,167 @@ function fleeBattle() {
     showScreen("game-screen");
 }
 
+// =========================
+// INVENTORY SCREEN
+// =========================
+
+function showInventory() {
+    renderInventory();
+    showScreen("inventory-screen");
+}
+
+// =========================
+// LOOT DROPS
+// =========================
+
+function awardLoot() {
+    // Enemies have a 70% chance to drop an item.
+    if (Math.random() >= 0.70) {
+        alert("No loot this time. Keep exploring!");
+        return;
+    }
+
+    const item = {
+        ...lootTable[
+            Math.floor(Math.random() * lootTable.length)
+        ],
+        id: `${Date.now()}-${Math.floor(Math.random() * 100000)}`
+    };
+
+    inventory.push(item);
+
+    alert(
+        `Loot found! You received: ${item.name} (${item.rarity}).`
+    );
+}
+
+// =========================
+// DISPLAY INVENTORY
+// =========================
+
+function renderInventory() {
+    const equippedContainer =
+        document.getElementById("equipped-items");
+
+    const inventoryContainer =
+        document.getElementById("inventory-items");
+
+    if (!equippedContainer || !inventoryContainer) return;
+
+    equippedContainer.innerHTML = `
+        <p><strong>Weapon:</strong> ${
+            equipped.weapon
+                ? `${equipped.weapon.name} (+${equipped.weapon.attackBonus} Attack)`
+                : "None equipped"
+        }</p>
+
+        <p><strong>Armor:</strong> ${
+            equipped.armor
+                ? `${equipped.armor.name} (+${equipped.armor.defenseBonus} Defense)`
+                : "None equipped"
+        }</p>
+    `;
+
+    if (inventory.length === 0) {
+        inventoryContainer.innerHTML =
+            "<p>Your inventory is empty. Defeat enemies to find loot!</p>";
+
+        return;
+    }
+
+    inventoryContainer.innerHTML = inventory.map((item, index) => {
+        const bonusText = item.type === "weapon"
+            ? `+${item.attackBonus} Attack`
+            : `+${item.defenseBonus} Defense`;
+
+        return `
+            <div class="inventory-item">
+                <div>
+                    <strong>${item.name}</strong>
+                    <p>${item.rarity} ${item.type} · ${bonusText}</p>
+                </div>
+
+                <button onclick="equipItem(${index})">
+                    Equip
+                </button>
+            </div>
+        `;
+    }).join("");
+}
+
+// =========================
+// EQUIP ITEMS
+// =========================
+
+function equipItem(index) {
+    const item = inventory[index];
+
+    if (!item) return;
+
+    const slot = item.type;
+    const previousItem = equipped[slot];
+
+    // Remove the previous item's bonuses.
+    if (previousItem) {
+        player.attack -= previousItem.attackBonus;
+        player.defense -= previousItem.defenseBonus;
+
+        inventory.push(previousItem);
+    }
+
+    // Apply the new item's bonuses.
+    player.attack += item.attackBonus;
+    player.defense += item.defenseBonus;
+
+    equipped[slot] = item;
+
+    inventory.splice(index, 1);
+
+    renderInventory();
+
+    alert(
+        `${item.name} equipped! Your stats have been updated.`
+    );
+}
+
+// =========================
+// UNEQUIP ITEMS
+// =========================
+
+function unequipItem(slot) {
+    const item = equipped[slot];
+
+    if (!item) return;
+
+    player.attack -= item.attackBonus;
+    player.defense -= item.defenseBonus;
+
+    inventory.push(item);
+    equipped[slot] = null;
+
+    renderInventory();
+}
 
 // =========================
 // NAVIGATION
 // =========================
 
 function returnToGame() {
-
     showScreen("game-screen");
 }
 
-
 function returnToTitle() {
-
     battleActive = false;
-
     showScreen("title-screen");
 }
 
-
 function showAbout() {
-
     showScreen("about-screen");
 }
 
-
 function showComingSoon(feature) {
-
     alert(`${feature} is coming soon!`);
 }
-
 
 // =========================
 // EVENT LISTENERS
@@ -920,17 +860,12 @@ function showComingSoon(feature) {
 document
     .getElementById("character-race")
     .addEventListener("change", function () {
-
         updateRacePreview();
         updateClassPreview();
-
     });
-
 
 document
     .getElementById("character-class")
     .addEventListener("change", function () {
-
         updateClassPreview();
-
     });
