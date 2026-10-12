@@ -822,18 +822,19 @@ function renderInventory() {
             ? `+${item.attackBonus} Attack`
             : `+${item.defenseBonus} Defense`;
 
-        return `
-            <div class="inventory-item">
-                <div>
-                    <strong>${item.name}</strong>
-                    <p>${item.rarity} ${item.type} · ${bonusText}</p>
-                </div>
+        
+return `
+    <div class="inventory-item rarity-${item.rarity.toLowerCase()}">
+        <div>
+            <strong class="item-name">${item.name}</strong>
+            <p>${item.rarity} ${item.type} · ${bonusText}</p>
+        </div>
 
-                <button onclick="equipItem(${index})">
-                    Equip
-                </button>
-            </div>
-        `;
+        <button onclick="equipItem(${index})">
+            Equip
+        </button>
+    </div>
+`;
     }).join("");
 }
 

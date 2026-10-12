@@ -505,3 +505,56 @@ button:active {
         flex-direction: column;
     }
 }
+
+
+/* =========================
+   INVENTORY ITEM RARITIES
+========================= */
+
+.inventory-item {
+    border-left: 4px solid #9CA3AF;
+    padding: 12px;
+    margin-bottom: 10px;
+    border-radius: 6px;
+}
+
+.rarity-common {
+    border-left-color: #9CA3AF;
+}
+
+.rarity-common .item-name {
+    color: #9CA3AF;
+}
+
+.rarity-uncommon {
+    border-left-color: #22C55E;
+}
+
+.rarity-uncommon .item-name {
+    color: #22C55E;
+}
+
+.rarity-rare {
+    border-left-color: #3B82F6;
+}
+
+.rarity-rare .item-name {
+    color: #3B82F6;
+}
+
+.rarity-epic {
+    border-left-color: #A855F7;
+}
+
+.rarity-epic .item-name {
+    color: #A855F7;
+}
+
+.rarity-legendary {
+    border-left-color: #F59E0B;
+    background: rgba(245, 158, 11, 0.08);
+}
+
+.rarity-legendary .item-name {
+    color: #F59E0B;
+}
