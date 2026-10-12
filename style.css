@@ -558,3 +558,59 @@ button:active {
 .rarity-legendary .item-name {
     color: #F59E0B;
 }
+
+
+/* =========================
+   BOSS BATTLE EFFECTS
+========================= */
+
+#enemy-health-bar.boss-health-bar {
+    background: linear-gradient(
+        90deg,
+        #7f1d1d,
+        #ef4444,
+        #991b1b
+    );
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+    transition: width 0.35s ease;
+}
+
+
+/* =========================
+   HEALTH BAR STYLES
+========================= */
+
+.health-bar {
+    width: 100%;
+    height: 20px;
+    background-color: #374151;
+    border: 2px solid #6b7280;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 10px 0;
+}
+
+.health-fill {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        #16a34a,
+        #4ade80
+    );
+    border-radius: 8px;
+    transition: width 0.35s ease;
+}
+
+/* Boss health bar */
+
+#enemy-health-bar.boss-health-bar {
+    background: linear-gradient(
+        90deg,
+        #7f1d1d,
+        #ef4444,
+        #991b1b
+    );
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+    transition: width 0.35s ease;
+}

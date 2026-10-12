@@ -494,9 +494,12 @@ function startBossBattle() {
 
     document.getElementById("battle-log-text").innerHTML = "";
 
-    addBattleLog(
-        `⚠️ BOSS ENCOUNTER! ${currentEnemy.name} appears!`
-    );
+
+addBattleLog("━━━━━━━━━━━━━━━━━━━━");
+addBattleLog("⚠️ A BOSS APPROACHES ⚠️");
+addBattleLog(`${currentEnemy.name.toUpperCase()}`);
+addBattleLog("Prepare yourself for a legendary battle!");
+addBattleLog("━━━━━━━━━━━━━━━━━━━━");
 
     showScreen("battle-screen");
 }
@@ -770,6 +773,16 @@ function updateBattleScreen() {
 
     document.getElementById("enemy-health-bar").style.width =
         `${enemyHealthPercent}%`;
+        
+        
+    const enemyHealthBar = document.getElementById("enemy-health-bar");
+
+    if (enemyHealthBar) {
+        enemyHealthBar.classList.toggle(
+            "boss-health-bar",
+            currentEnemy.isBoss === true
+        );
+    }
 }
 
 // =========================
