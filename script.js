@@ -402,6 +402,8 @@ function createCharacter() {
 
 function showCharacter() {
 
+    showScreen("character-details-screen");
+
     document.getElementById("character-details-name").textContent =
         player.name;
 
@@ -410,6 +412,9 @@ function showCharacter() {
 
     document.getElementById("character-details-class").textContent =
         `Class: ${player.class}`;
+
+    document.getElementById("character-details-level").textContent =
+        player.level;
 
     document.getElementById("character-details-health").textContent =
         `${player.currentHealth} / ${player.maxHealth}`;
@@ -426,7 +431,7 @@ function showCharacter() {
     document.getElementById("character-details-magic").textContent =
         player.magic;
 
-    showScreen("character-details-screen");
+    updateXPBar();
 }
 
 
@@ -659,6 +664,18 @@ function awardXP(amount) {
     );
 
     checkLevelUp();
+}
+
+function updateXPBar() {
+
+    const xpPercentage =
+        (player.xp / player.xpToNextLevel) * 100;
+
+    document.getElementById("character-xp-bar").style.width =
+        `${xpPercentage}%`;
+
+    document.getElementById("character-xp-text").textContent =
+        `${player.xp} / ${player.xpToNextLevel} XP`;
 }
 
 

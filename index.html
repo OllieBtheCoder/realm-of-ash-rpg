@@ -185,58 +185,80 @@
         </section>
 
 
-        <!-- ========================= -->
-        <!-- CHARACTER DETAILS -->
-        <!-- ========================= -->
+       <!-- ========================= -->
+<!-- CHARACTER DETAILS -->
+<!-- ========================= -->
 
-        <section id="character-details-screen" class="screen">
+<section id="character-details-screen" class="screen">
 
-            <div class="panel">
+    <div class="panel">
 
-                <h2 id="character-details-name">
-                    Character
-                </h2>
+        <h2 id="character-details-name">
+            Character
+        </h2>
 
-                <p id="character-details-race"></p>
+        <p id="character-details-race"></p>
 
-                <p id="character-details-class"></p>
+        <p id="character-details-class"></p>
 
-                <hr>
+        <p>
+            ⭐ Level:
+            <span id="character-details-level"></span>
+        </p>
 
-                <h3>Stats</h3>
+        <div class="xp-section">
 
-                <p>
-                    ❤️ Health:
-                    <span id="character-details-health"></span>
-                </p>
+            <h3>Experience</h3>
 
-                <p>
-                    ⚔️ Attack:
-                    <span id="character-details-attack"></span>
-                </p>
-
-                <p>
-                    🛡️ Defense:
-                    <span id="character-details-defense"></span>
-                </p>
-
-                <p>
-                    ⚡ Speed:
-                    <span id="character-details-speed"></span>
-                </p>
-
-                <p>
-                    🔮 Magic:
-                    <span id="character-details-magic"></span>
-                </p>
-
-                <button onclick="returnToGame()">
-                    Back
-                </button>
-
+            <div class="xp-bar">
+                <div
+                    id="character-xp-bar"
+                    class="xp-fill"
+                ></div>
             </div>
 
-        </section>
+            <p id="character-xp-text">
+                0 / 100 XP
+            </p>
+
+        </div>
+
+        <hr>
+
+        <h3>Stats</h3>
+
+        <p>
+            ❤️ Health:
+            <span id="character-details-health"></span>
+        </p>
+
+        <p>
+            ⚔️ Attack:
+            <span id="character-details-attack"></span>
+        </p>
+
+        <p>
+            🛡️ Defense:
+            <span id="character-details-defense"></span>
+        </p>
+
+        <p>
+            ⚡ Speed:
+            <span id="character-details-speed"></span>
+        </p>
+
+        <p>
+            🔮 Magic:
+            <span id="character-details-magic"></span>
+        </p>
+
+        <button onclick="returnToGame()">
+            Back
+        </button>
+
+    </div>
+
+</section>
 
 
        <!-- ========================= -->

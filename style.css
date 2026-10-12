@@ -416,3 +416,42 @@ button:active {
     opacity: 0.45;
     cursor: not-allowed;
 }
+/* ========================= */
+/* XP SYSTEM */
+/* ========================= */
+
+.xp-section {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.xp-section h3 {
+    margin-bottom: 10px;
+}
+
+.xp-bar {
+    width: 100%;
+    height: 20px;
+    background: #222;
+    border: 2px solid #8c6b3e;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 0 8px #000;
+}
+
+.xp-fill {
+    width: 0%;
+    height: 100%;
+    background: linear-gradient(
+        90deg,
+        #5b3fa3,
+        #9b6cff
+    );
+    transition: width 0.4s ease;
+}
+
+#character-xp-text {
+    text-align: center;
+    margin-top: 8px;
+    font-size: 0.9rem;
+}
