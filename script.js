@@ -223,6 +223,133 @@ const bosses = [
 
 let defeatedBosses = [];
 
+
+ // =========================
+ // QUEST SYSTEM
+ // =========================
+
+const questDefinitions = [
+    {
+        id: "first-hunt",
+        title: "The First Hunt",
+        description: "Defeat 3 enemies to prove yourself.",
+        type: "enemy-count",
+        target: 3,
+        rewardXP: 50,
+        rewardItem: "Hunter's Bow"
+    },
+    {
+        id: "fallen-king",
+        title: "The Fallen King's End",
+        description: "Defeat The Fallen King.",
+        type: "boss",
+        target: "The Fallen King",
+        rewardXP: 100,
+        rewardItem: "Guardian's Plate"
+    },
+    {
+        id: "dragonfall",
+        title: "Dragonfall",
+        description: "Defeat The Ashen Dragon.",
+        type: "boss",
+        target: "The Ashen Dragon",
+        rewardXP: 200,
+        rewardItem: "Stormbringer"
+    }
+];
+
+// Each new adventure starts with fresh quest progress.
+function createQuestProgress() {
+    const progress = {};
+
+    questDefinitions.forEach(quest => {
+        progress[quest.id] = {
+            progress: 0,
+            completed: false
+        };
+    });
+
+    return progress;
+}
+
+let questProgress = createQuestProgress();
+
+
+function completeQuest(quest) {
+    const progress = questProgress[quest.id];
+
+    // Prevent the same quest from rewarding you twice.
+    if (!progress || progress.completed) {
+        return;
+    }
+
+    progress.completed = true;
+
+    // Award the quest XP.
+    player.xp += quest.rewardXP;
+
+    showNotification(
+        `Quest completed: ${quest.title}!\nYou earned ${quest.rewardXP} XP!`,
+        "📜 Quest Complete!"
+    );
+
+    // Check whether the player earned a level.
+    checkLevelUp();
+
+    // Find the quest's reward item.
+    const rewardTemplate = lootTable.find(
+        item => item.name === quest.rewardItem
+    );
+
+    if (rewardTemplate) {
+        const rewardItem = {
+            ...rewardTemplate,
+            id: `item-${Date.now()}-${Math.floor(Math.random() * 100000)}`
+        };
+
+        inventory.push(rewardItem);
+
+        showNotification(
+            `You received ${quest.rewardItem}!`,
+            "🎁 Quest Reward!"
+        );
+
+        renderInventory();
+    }
+
+    // Save the completed quest and its rewards.
+    autoSaveGame();
+}
+
+
+function recordEnemyDefeat(defeatedEnemy) {
+    questDefinitions.forEach(quest => {
+        const progress = questProgress[quest.id];
+
+        // Skip quests that have already been completed.
+        if (!progress || progress.completed) {
+            return;
+        }
+
+        // Count defeated enemies for The First Hunt.
+        if (quest.id === "first-hunt") {
+            progress.progress++;
+
+            if (progress.progress >= quest.target) {
+                completeQuest(quest);
+            }
+        }
+
+        // Complete boss quests when their target is defeated.
+        if (
+            quest.type === "boss" &&
+            defeatedEnemy.name === quest.target
+        ) {
+            completeQuest(quest);
+        }
+    });
+}
+
 let currentEnemy = null;
 let battleActive = false;
 let abilityCooldown = 0;
@@ -457,6 +584,8 @@ function createCharacter() {
     };
 
     defeatedBosses = [];
+
+    questProgress = createQuestProgress();
 
     document.getElementById("welcome-message").textContent =
         `Welcome, ${player.name}. Your adventure begins.`;
@@ -726,6 +855,7 @@ function checkEnemyDefeated() {
         setTimeout(() => {
             awardXP(xpEarned);
             const loot = awardLoot();
+            recordEnemyDefeat(defeatedEnemy);
 
             // Save this adventure's updated XP, loot, and boss progress.
             autoSaveGame();
@@ -1210,6 +1340,7 @@ function autoSaveGame() {
         inventory: inventory,
         equipped: equipped,
         defeatedBosses: defeatedBosses,
+        questProgress: questProgress,
         savedAt: new Date().toISOString()
     };
 
@@ -1374,6 +1505,29 @@ function loadGame(adventureId) {
 
     defeatedBosses = savedData.defeatedBosses;
 
+    
+const loadedQuestProgress = createQuestProgress();
+
+if (
+    savedData.questProgress &&
+    typeof savedData.questProgress === "object"
+) {
+    questDefinitions.forEach(quest => {
+        const savedQuest = savedData.questProgress[quest.id];
+
+        if (savedQuest && typeof savedQuest === "object") {
+            loadedQuestProgress[quest.id] = {
+                progress: Number.isFinite(savedQuest.progress)
+                    ? savedQuest.progress
+                    : 0,
+                completed: savedQuest.completed === true
+            };
+        }
+    });
+}
+
+questProgress = loadedQuestProgress;
+
     currentAdventureId = savedData.id;
 
     currentEnemy = null;
@@ -1427,6 +1581,57 @@ function deleteAdventure(adventureId) {
 
         showAdventureMenu();
     }
+}
+
+
+
+ // =========================
+ // QUEST JOURNAL
+ // =========================
+
+function showQuests() {
+    const questList = document.getElementById("quest-list");
+
+    if (!questList) {
+        showNotification(
+            "The Quest Journal screen could not be found.",
+            "⚠️ Screen Missing"
+        );
+        return;
+    }
+
+    questList.innerHTML = questDefinitions.map(quest => {
+        const progress = questProgress[quest.id] || {
+            progress: 0,
+            completed: false
+        };
+
+        const isBossQuest = quest.type === "boss";
+
+        const objectiveComplete = isBossQuest
+            ? defeatedBosses.includes(quest.target)
+            : progress.progress >= quest.target;
+
+        const currentProgress = isBossQuest
+            ? (objectiveComplete ? 1 : 0)
+            : Math.min(progress.progress, quest.target);
+
+        const progressText = isBossQuest
+            ? `${currentProgress} / 1 boss defeated`
+            : `${currentProgress} / ${quest.target} enemies defeated`;
+
+        return `
+            <div class="quest-card ${progress.completed ? "quest-completed" : ""}">
+                <h3>${escapeHTML(quest.title)}</h3>
+                <p>${escapeHTML(quest.description)}</p>
+                <p><strong>Progress:</strong> ${progressText}</p>
+                <p><strong>Reward:</strong> ${quest.rewardXP} XP + ${escapeHTML(quest.rewardItem)}</p>
+                <p>${progress.completed ? "✅ Quest Completed!" : "🗡️ In Progress"}</p>
+            </div>
+        `;
+    }).join("");
+
+    showScreen("quest-screen");
 }
 
 // =========================
