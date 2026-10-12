@@ -402,31 +402,52 @@ function updateClassPreview() {
         classData.magic + raceData.magic;
 }
 
+
 function createCharacter() {
     const name = document.getElementById("character-name").value.trim();
     const race = document.getElementById("character-race").value;
     const selectedClass = document.getElementById("character-class").value;
 
+    if (!name) {
+        showNotification(
+            "Please enter a name for your hero before beginning.",
+            "⚠️ Name Required"
+        );
+        return;
+    }
 
     const classData = classes[selectedClass];
     const raceData = races[race];
 
-    player.name = name;
-    player.race = race;
-    player.class = selectedClass;
+    if (!classData || !raceData) {
+        showNotification(
+            "Please choose a valid race and class.",
+            "⚠️ Invalid Character"
+        );
+        return;
+    }
 
-    player.health = classData.health + raceData.health;
-    player.maxHealth = player.health;
-    player.currentHealth = player.health;
+    // Give this adventure its own unique ID.
+    currentAdventureId = `adventure-${Date.now()}-${Math.floor(Math.random() * 100000)}`;
 
-    player.attack = classData.attack + raceData.attack;
-    player.defense = classData.defense + raceData.defense;
-    player.speed = classData.speed + raceData.speed;
-    player.magic = classData.magic + raceData.magic;
+    player = {
+        name: name,
+        race: race,
+        class: selectedClass,
 
-    player.level = 1;
-    player.xp = 0;
-    player.xpToNextLevel = 100;
+        health: classData.health + raceData.health,
+        maxHealth: classData.health + raceData.health,
+        currentHealth: classData.health + raceData.health,
+
+        attack: classData.attack + raceData.attack,
+        defense: classData.defense + raceData.defense,
+        speed: classData.speed + raceData.speed,
+        magic: classData.magic + raceData.magic,
+
+        level: 1,
+        xp: 0,
+        xpToNextLevel: 100
+    };
 
     inventory = [];
 
@@ -435,10 +456,17 @@ function createCharacter() {
         armor: null
     };
 
+    defeatedBosses = [];
+
     document.getElementById("welcome-message").textContent =
         `Welcome, ${player.name}. Your adventure begins.`;
 
     showScreen("game-screen");
+
+    // Create the first save for this adventure.
+    autoSaveGame();
+
+    updateTitleMenu();
 }
 
 // =========================
@@ -698,6 +726,9 @@ function checkEnemyDefeated() {
         setTimeout(() => {
             awardXP(xpEarned);
             const loot = awardLoot();
+
+            // Save this adventure's updated XP, loot, and boss progress.
+            autoSaveGame();
 
             // Set up the victory screen.
             document.getElementById("victory-title").textContent =
@@ -1063,9 +1094,11 @@ function equipItem(index) {
     inventory.splice(index, 1);
 
     renderInventory();
+    autoSaveGame();
 
-    alert(
-        `${item.name} equipped! Your stats have been updated.`
+    showNotification(
+        `${item.name} equipped! Your stats have been updated.`,
+        "⚔️ Equipment Updated"
     );
 }
 
@@ -1085,6 +1118,315 @@ function unequipItem(slot) {
     equipped[slot] = null;
 
     renderInventory();
+    autoSaveGame();
+}
+
+
+
+ // =========================
+ // MULTIPLE ADVENTURE SAVES
+ // =========================
+
+const SAVE_SLOTS_KEY = "realmOfAshAdventures";
+
+// Get all saved adventures.
+
+function getSavedAdventures() {
+    try {
+        const saved = localStorage.getItem(SAVE_SLOTS_KEY);
+
+        if (saved) {
+            const adventures = JSON.parse(saved);
+            return Array.isArray(adventures) ? adventures : [];
+        }
+
+        // Migrate the old single save into the new system.
+        const oldSave = localStorage.getItem("realmOfAshSave");
+
+        if (oldSave) {
+            const oldData = JSON.parse(oldSave);
+
+            if (oldData.player && oldData.player.name) {
+                const migratedAdventure = {
+                    ...oldData,
+                    id: `adventure-${Date.now()}`,
+                    name: oldData.player.name,
+                    savedAt: oldData.savedAt || new Date().toISOString()
+                };
+
+                localStorage.setItem(
+                    SAVE_SLOTS_KEY,
+                    JSON.stringify([migratedAdventure])
+                );
+
+                // Keep the old save as a backup.
+                return [migratedAdventure];
+            }
+        }
+
+        return [];
+    } catch (error) {
+        console.error("Could not read saved adventures:", error);
+        return [];
+    }
+}
+
+// Save the complete list of adventures.
+function storeSavedAdventures(adventures) {
+    try {
+        localStorage.setItem(
+            SAVE_SLOTS_KEY,
+            JSON.stringify(adventures)
+        );
+
+        return true;
+    } catch (error) {
+        console.error("Could not save adventures:", error);
+
+        showNotification(
+            "Your adventure could not be saved. Check available browser storage.",
+            "⚠️ Save Failed"
+        );
+
+        return false;
+    }
+}
+
+// The ID of the adventure currently being played.
+let currentAdventureId = null;
+
+// Save the current character into their own slot.
+function autoSaveGame() {
+    if (!player.name || battleActive || !currentAdventureId) {
+        return false;
+    }
+
+    const adventures = getSavedAdventures();
+
+    const adventureData = {
+        id: currentAdventureId,
+        name: player.name,
+        player: player,
+        inventory: inventory,
+        equipped: equipped,
+        defeatedBosses: defeatedBosses,
+        savedAt: new Date().toISOString()
+    };
+
+    const existingIndex = adventures.findIndex(
+        adventure => adventure.id === currentAdventureId
+    );
+
+    if (existingIndex >= 0) {
+        adventures[existingIndex] = adventureData;
+    } else {
+        adventures.push(adventureData);
+    }
+
+    return storeSavedAdventures(adventures);
+}
+
+// Manually save the current adventure.
+function saveGame() {
+    if (!player.name || !currentAdventureId) {
+        showNotification(
+            "Start an adventure before saving!",
+            "⚠️ No Adventure"
+        );
+        return;
+    }
+
+    if (battleActive) {
+        showNotification(
+            "Finish your battle before saving.",
+            "⚔️ Battle in Progress"
+        );
+        return;
+    }
+
+    if (autoSaveGame()) {
+        showNotification(
+            `${player.name}'s adventure has been saved separately.`,
+            "💾 Adventure Saved"
+        );
+    }
+}
+
+// Display the adventure selection menu.
+function showAdventureMenu() {
+    const adventures = getSavedAdventures();
+
+    const menu = document.getElementById("adventure-list");
+
+    if (!menu) {
+        showNotification(
+            "The adventure selection screen has not been added to index.html yet.",
+            "⚠️ Menu Not Ready"
+        );
+        return;
+    }
+
+    if (adventures.length === 0) {
+        menu.innerHTML = `
+            <p>No saved adventures yet.</p>
+            <button onclick="beginNewAdventure()">
+                ✨ Create Your First Adventure
+            </button>
+        `;
+    } else {
+        menu.innerHTML = adventures.map(adventure => {
+            const savedPlayer = adventure.player || {};
+            const savedDate = adventure.savedAt
+                ? new Date(adventure.savedAt).toLocaleString()
+                : "Unknown";
+
+            return `
+                <div class="adventure-slot">
+                    <h3>${escapeHTML(adventure.name || "Unnamed Hero")}</h3>
+                    <p>${escapeHTML(savedPlayer.race || "Unknown Race")}
+                        ${escapeHTML(savedPlayer.class || "Unknown Class")}</p>
+                    <p>Level ${Number(savedPlayer.level) || 1}</p>
+                    <p>Last saved: ${escapeHTML(savedDate)}</p>
+
+                    <button onclick="loadGame('${adventure.id}')">
+                        📜 Load Adventure
+                    </button>
+
+                    <button onclick="deleteAdventure('${adventure.id}')">
+                        🗑️ Delete
+                    </button>
+                </div>
+            `;
+        }).join("");
+        
+        menu.innerHTML += `
+            <button onclick="beginNewAdventure()">
+                ➕ Begin New Adventure
+            </button>
+        `;
+    }
+
+    showScreen("adventure-select-screen");
+}
+
+// Escape text before putting player-controlled values into HTML.
+function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, character => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[character]);
+}
+
+// Start creating a separate adventure.
+function beginNewAdventure() {
+    currentAdventureId = null;
+
+    document.getElementById("character-name").value = "";
+
+    showCharacterCreation();
+}
+
+// Load a specific saved adventure.
+function loadGame(adventureId) {
+    const adventures = getSavedAdventures();
+
+    const savedData = adventures.find(
+        adventure => adventure.id === adventureId
+    );
+
+    if (!savedData) {
+        showNotification(
+            "That saved adventure could not be found.",
+            "⚠️ Save Not Found"
+        );
+        return;
+    }
+
+    if (
+        !savedData.player ||
+        !classes[savedData.player.class] ||
+        !races[savedData.player.race] ||
+        !Array.isArray(savedData.inventory) ||
+        !savedData.equipped ||
+        !Array.isArray(savedData.defeatedBosses)
+    ) {
+        showNotification(
+            "This save may be damaged or incompatible.",
+            "⚠️ Load Failed"
+        );
+        return;
+    }
+
+    player = {
+        ...player,
+        ...savedData.player
+    };
+
+    inventory = savedData.inventory;
+
+    equipped = {
+        weapon: savedData.equipped.weapon || null,
+        armor: savedData.equipped.armor || null
+    };
+
+    defeatedBosses = savedData.defeatedBosses;
+
+    currentAdventureId = savedData.id;
+
+    currentEnemy = null;
+    battleActive = false;
+    abilityCooldown = 0;
+
+    document.getElementById("welcome-message").textContent =
+        `Welcome back, ${player.name}. Your adventure continues.`;
+
+    updateXPBar();
+    updateAbilityButton();
+    renderInventory();
+
+    showScreen("game-screen");
+
+    showNotification(
+        `Welcome back, ${player.name}!\nLevel: ${player.level}\nXP: ${player.xp} / ${player.xpToNextLevel}\nDefeated bosses: ${defeatedBosses.length}`,
+        "📜 Adventure Restored"
+    );
+}
+
+// Delete one adventure without touching the others.
+function deleteAdventure(adventureId) {
+    const adventures = getSavedAdventures();
+
+    const selected = adventures.find(
+        adventure => adventure.id === adventureId
+    );
+
+    if (!selected) {
+        showAdventureMenu();
+        return;
+    }
+
+    const confirmed = confirm(
+        `Permanently delete ${selected.name}'s adventure? This cannot be undone.`
+    );
+
+    if (!confirmed) {
+        return;
+    }
+
+    const remaining = adventures.filter(
+        adventure => adventure.id !== adventureId
+    );
+
+    if (storeSavedAdventures(remaining)) {
+        if (currentAdventureId === adventureId) {
+            currentAdventureId = null;
+        }
+
+        showAdventureMenu();
+    }
 }
 
 // =========================
@@ -1095,10 +1437,14 @@ function returnToGame() {
     showScreen("game-screen");
 }
 
+
+
 function returnToTitle() {
     battleActive = false;
+    updateTitleMenu();
     showScreen("title-screen");
 }
+
 
 function showAbout() {
     showScreen("about-screen");
@@ -1106,6 +1452,31 @@ function showAbout() {
 
 function showComingSoon(feature) {
     alert(`${feature} is coming soon!`);
+}
+
+
+
+function updateTitleMenu() {
+    const titleMenu = document.getElementById("title-menu");
+    const adventures = getSavedAdventures();
+
+    if (adventures.length > 0) {
+        titleMenu.innerHTML = `
+            <button onclick="showAdventureMenu()">
+                📜 Load Adventure
+            </button>
+
+            <button onclick="beginNewAdventure()">
+                ✨ Begin New Adventure
+            </button>
+        `;
+    } else {
+        titleMenu.innerHTML = `
+            <button onclick="beginNewAdventure()">
+                ⚔️ Begin Adventure
+            </button>
+        `;
+    }
 }
 
 // =========================
@@ -1125,7 +1496,4 @@ document
         updateClassPreview();
     });
 
-    showNotification(
-    "The ancient gates have opened. Your adventure awaits!",
-    "⚔️ A Message from the Realm"
-);
+    updateTitleMenu();

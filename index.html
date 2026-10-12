@@ -20,23 +20,45 @@
 
         <section id="title-screen" class="screen active">
 
-            <div class="title-container">
 
-                <h1>Realm of Ash</h1>
+<div class="title-container">
 
-                <p>A Fantasy RPG Adventure</p>
+    <h1>Realm of Ash</h1>
 
-                <button onclick="showCharacterCreation()">
-                    Begin Adventure
-                </button>
+    <p>A Fantasy RPG Adventure</p>
 
-                <button onclick="showAbout()">
-                    About
-                </button>
+    <div id="title-menu">
 
-            </div>
+        <button onclick="showCharacterCreation()">
+            Begin Adventure
+        </button>
+
+    </div>
+
+    <button onclick="showAbout()">
+        About
+    </button>
+
+</div>
 
         </section>
+
+        
+<!-- ADVENTURE SELECTION SCREEN -->
+<section id="adventure-select-screen" class="screen">
+    <div class="title-container">
+        <h1>Choose Your Adventure</h1>
+        <p>Select a saved hero or begin a new journey.</p>
+
+        <div id="adventure-list">
+            <p>Loading adventures...</p>
+        </div>
+
+        <button onclick="returnToTitle()">
+            ← Back to Main Menu
+        </button>
+    </div>
+</section>
 
 
         <!-- ========================= -->
@@ -180,6 +202,20 @@
 
                     <button onclick="showComingSoon('Quests')">
                         📜 Quests
+                    </button>
+
+                    
+                    <button onclick="saveGame()">
+                        💾 Save Game
+                    </button>
+
+                    <button onclick="loadGame()">
+                        📜 Load Game
+                    </button>
+
+                    
+                    <button class="secondary" onclick="showCharacterCreation()">
+                        🆕 New Character
                     </button>
 
                 </div>
