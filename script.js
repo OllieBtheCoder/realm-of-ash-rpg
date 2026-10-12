@@ -177,6 +177,9 @@ const bosses = [
     }
 ];
 
+
+let defeatedBosses = [];
+
 let currentEnemy = null;
 let battleActive = false;
 let abilityCooldown = 0;
@@ -469,19 +472,38 @@ function startExploration() {
 }
 
 
+
 function startBossBattle() {
     if (!player.name) {
         alert("Create a character first!");
         return;
     }
 
-    const randomIndex = Math.floor(
-        Math.random() * bosses.length
-    );
+    // The Fallen King is the first boss.
+    // The Ashen Dragon unlocks after the King is defeated.
+    let availableBosses = [];
+
+    if (!defeatedBosses.includes("The Fallen King")) {
+        availableBosses.push(
+            bosses.find(boss => boss.name === "The Fallen King")
+        );
+    } else if (!defeatedBosses.includes("The Ashen Dragon")) {
+        availableBosses.push(
+            bosses.find(boss => boss.name === "The Ashen Dragon")
+        );
+    } else {
+        alert("You have defeated every boss! You are a legend!");
+        return;
+    }
+
+    // Select an available boss.
+    const selectedBoss = availableBosses[
+        Math.floor(Math.random() * availableBosses.length)
+    ];
 
     currentEnemy = {
-        ...bosses[randomIndex],
-        currentHealth: bosses[randomIndex].health
+        ...selectedBoss,
+        currentHealth: selectedBoss.health
     };
 
     player.currentHealth = player.maxHealth;
@@ -494,12 +516,11 @@ function startBossBattle() {
 
     document.getElementById("battle-log-text").innerHTML = "";
 
-
-addBattleLog("━━━━━━━━━━━━━━━━━━━━");
-addBattleLog("⚠️ A BOSS APPROACHES ⚠️");
-addBattleLog(`${currentEnemy.name.toUpperCase()}`);
-addBattleLog("Prepare yourself for a legendary battle!");
-addBattleLog("━━━━━━━━━━━━━━━━━━━━");
+    addBattleLog("━━━━━━━━━━━━━━━━━━━━");
+    addBattleLog("⚠️ A BOSS APPROACHES ⚠️");
+    addBattleLog(`${currentEnemy.name.toUpperCase()}`);
+    addBattleLog("Prepare yourself for a legendary battle!");
+    addBattleLog("━━━━━━━━━━━━━━━━━━━━");
 
     showScreen("battle-screen");
 }
@@ -602,6 +623,7 @@ function useAbility() {
 // ENEMY DEFEATED
 // =========================
 
+
 function checkEnemyDefeated() {
     if (currentEnemy.currentHealth <= 0) {
         battleActive = false;
@@ -609,6 +631,37 @@ function checkEnemyDefeated() {
         addBattleLog(
             `The ${currentEnemy.name} has been defeated!`
         );
+
+        // Record boss victories and unlock progression.
+        if (currentEnemy.isBoss === true) {
+            if (!defeatedBosses.includes(currentEnemy.name)) {
+                defeatedBosses.push(currentEnemy.name);
+            }
+
+            if (currentEnemy.name === "The Fallen King") {
+                addBattleLog(
+                    "🏆 The Fallen King has fallen!"
+                );
+                addBattleLog(
+                    "🐉 The Ashen Dragon has been unlocked!"
+                );
+
+                alert(
+                    "VICTORY! The Fallen King is defeated!\n\n" +
+                    "The Ashen Dragon has been unlocked!"
+                );
+            } else if (currentEnemy.name === "The Ashen Dragon") {
+                addBattleLog(
+                    "🏆 You have defeated the final boss!"
+                );
+
+                alert(
+                    "LEGENDARY VICTORY!\n\n" +
+                    "You have defeated The Ashen Dragon " +
+                    "and conquered Realm of Ash!"
+                );
+            }
+        }
 
         setTimeout(() => {
             awardXP(currentEnemy.xp);
