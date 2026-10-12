@@ -698,3 +698,42 @@ button:active {
         transform: translateY(0) scale(1);
     }
 }
+
+
+/* ACTIVE QUEST TRACKER */
+
+.quest-tracker {
+    margin: 20px auto;
+    padding: 18px;
+    max-width: 600px;
+    background: rgba(25, 22, 29, 0.95);
+    border: 1px solid #a77b43;
+    border-radius: 12px;
+    color: #f4e8d2;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+.quest-tracker h3 {
+    margin-top: 0;
+    color: #e6bd78;
+}
+
+.quest-progress-track {
+    width: 100%;
+    height: 10px;
+    margin: 12px 0;
+    overflow: hidden;
+    background: #45404a;
+    border-radius: 10px;
+}
+
+.quest-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #a66a2c, #e6bd78);
+    border-radius: 10px;
+    transition: width 0.3s ease;
+}
+
+.quest-tracker button {
+    margin-top: 8px;
+}

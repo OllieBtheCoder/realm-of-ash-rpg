@@ -348,6 +348,8 @@ function recordEnemyDefeat(defeatedEnemy) {
             completeQuest(quest);
         }
     });
+
+    updateActiveQuestTracker();
 }
 
 let currentEnemy = null;
@@ -586,6 +588,8 @@ function createCharacter() {
     defeatedBosses = [];
 
     questProgress = createQuestProgress();
+
+    updateActiveQuestTracker();
 
     document.getElementById("welcome-message").textContent =
         `Welcome, ${player.name}. Your adventure begins.`;
@@ -1508,6 +1512,7 @@ function loadGame(adventureId) {
     
 const loadedQuestProgress = createQuestProgress();
 
+
 if (
     savedData.questProgress &&
     typeof savedData.questProgress === "object"
@@ -1524,6 +1529,8 @@ if (
             };
         }
     });
+
+    updateActiveQuestTracker();
 }
 
 questProgress = loadedQuestProgress;
@@ -1589,6 +1596,59 @@ function deleteAdventure(adventureId) {
  // QUEST JOURNAL
  // =========================
 
+
+
+function updateActiveQuestTracker() {
+    const content = document.getElementById("active-quest-content");
+
+    if (!content) {
+        return;
+    }
+
+    // Find the first quest that hasn't been completed.
+    const quest = questDefinitions.find(
+        quest => !questProgress[quest.id]?.completed
+    );
+
+    // Show a message if every quest is finished.
+    if (!quest) {
+        content.innerHTML = `
+            <p>🏆 All quests completed!</p>
+            <p>You have conquered every current objective.</p>
+        `;
+        return;
+    }
+
+    const progress = questProgress[quest.id];
+    const isBossQuest = quest.type === "boss";
+
+    let currentProgress;
+    let progressText;
+
+    if (isBossQuest) {
+        const defeated = defeatedBosses.includes(quest.target);
+        currentProgress = defeated ? 1 : 0;
+        progressText = defeated ? "1 / 1 boss defeated" : "0 / 1 boss defeated";
+    } else {
+        currentProgress = Math.min(progress.progress, quest.target);
+        progressText = `${currentProgress} / ${quest.target} enemies defeated`;
+    }
+
+    const percentage = isBossQuest
+        ? currentProgress * 100
+        : (currentProgress / quest.target) * 100;
+
+    content.innerHTML = `
+        <h4>${escapeHTML(quest.title)}</h4>
+        <p>${escapeHTML(quest.description)}</p>
+        <p><strong>Progress:</strong> ${progressText}</p>
+        <div class="quest-progress-track">
+            <div class="quest-progress-fill" style="width: ${percentage}%"></div>
+        </div>
+        <p><strong>Reward:</strong> ${quest.rewardXP} XP + ${escapeHTML(quest.rewardItem)}</p>
+    `;
+}
+
 function showQuests() {
     const questList = document.getElementById("quest-list");
 
@@ -1631,6 +1691,7 @@ function showQuests() {
         `;
     }).join("");
 
+    updateActiveQuestTracker();
     showScreen("quest-screen");
 }
 
