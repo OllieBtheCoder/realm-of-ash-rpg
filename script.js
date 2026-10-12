@@ -132,7 +132,15 @@ const enemies = [
         attack: 20,
         defense: 15,
         xp: 60,
-        loot: ["Iron Blade", "Iron Chestplate", "Guardian's Plate"]
+        loot: [
+            "Iron Blade",
+            "Iron Chestplate",
+            "Guardian's Plate",
+            "Stormbringer",
+            "Dragonscale Armor",
+            "Void Reaver",
+            "Armor of the Fallen King"
+        ]
     }
 ];
 
@@ -200,6 +208,35 @@ const lootTable = [
         attackBonus: 0,
         defenseBonus: 6,
         rarity: "Rare"
+    },
+
+    {
+        name: "Stormbringer",
+        type: "weapon",
+        attackBonus: 9,
+        defenseBonus: 0,
+        rarity: "Epic"
+    },
+    {
+        name: "Void Reaver",
+        type: "weapon",
+        attackBonus: 14,
+        defenseBonus: 0,
+        rarity: "Legendary"
+    },
+    {
+        name: "Dragonscale Armor",
+        type: "armor",
+        attackBonus: 0,
+        defenseBonus: 9,
+        rarity: "Epic"
+    },
+    {
+        name: "Armor of the Fallen King",
+        type: "armor",
+        attackBonus: 0,
+        defenseBonus: 14,
+        rarity: "Legendary"
     }
 ];
 
