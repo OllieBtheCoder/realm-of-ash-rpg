@@ -793,3 +793,30 @@ button:active {
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+
+/* REALM OF ASH TITLE SCREEN BACKGROUND */
+
+#title-screen {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background-image:
+        linear-gradient(
+            rgba(12, 10, 18, 0.45),
+            rgba(12, 10, 18, 0.78)
+        ),
+        url("images/realm-background.jpg");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 100vh;
+}
+
+#title-screen .title-container {
+    position: relative;
+    z-index: 1;
+    width: min(90%, 850px);
+    margin: 0 auto;
+    padding: 60px 20px;
+}
