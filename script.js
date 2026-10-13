@@ -912,10 +912,23 @@ function checkEnemyDefeated() {
             }
         }
 
-        setTimeout(() => {
-            awardXP(xpEarned);
-            const loot = awardLoot();
-            recordEnemyDefeat(defeatedEnemy);
+
+setTimeout(() => {
+    awardXP(xpEarned);
+
+    // Award gold for defeating an enemy.
+    const goldEarned = defeatedEnemy.isBoss
+        ? 100 + Math.floor(Math.random() * 101)
+        : 15 + Math.floor(Math.random() * 21);
+
+    playerGold += goldEarned;
+
+    addBattleLog(
+        `💰 You earned ${goldEarned} gold!`
+    );
+
+    const loot = awardLoot();
+    recordEnemyDefeat(defeatedEnemy);
 
             // Save this adventure's updated XP, loot, and boss progress.
             autoSaveGame();
@@ -935,7 +948,7 @@ function checkEnemyDefeated() {
                         : `${defeatedEnemy.name} can no longer threaten you!`;
 
             document.getElementById("victory-xp").textContent =
-                xpEarned;
+                `${xpEarned} XP | 💰 ${goldEarned} Gold`;
 
             document.getElementById("victory-loot").textContent =
                 loot
@@ -1214,19 +1227,38 @@ function renderInventory() {
 
     if (!equippedContainer || !inventoryContainer) return;
 
-    equippedContainer.innerHTML = `
-        <p><strong>Weapon:</strong> ${
-            equipped.weapon
-                ? `${equipped.weapon.name} (+${equipped.weapon.attackBonus} Attack)`
-                : "None equipped"
-        }</p>
 
-        <p><strong>Armor:</strong> ${
-            equipped.armor
-                ? `${equipped.armor.name} (+${equipped.armor.defenseBonus} Defense)`
-                : "None equipped"
-        }</p>
-    `;
+equippedContainer.innerHTML = `
+    <p><strong>Weapon:</strong> ${
+        equipped.weapon
+            ? `${equipped.weapon.name} (+${
+                equipped.weapon.attackBonus ??
+                equipped.weapon.attack ?? 0
+            } Attack)`
+            : "None equipped"
+    }</p>
+
+    <p><strong>Armor:</strong> ${
+        equipped.armor
+            ? `${equipped.armor.name} (+${
+                equipped.armor.defenseBonus ??
+                equipped.armor.defense ?? 0
+            } Defense)`
+            : "None equipped"
+    }</p>
+
+    <p><strong>Boots:</strong> ${
+        equipped.boots
+            ? `${equipped.boots.name} (+${
+                equipped.boots.defenseBonus ??
+                equipped.boots.defense ?? 0
+            } Defense, +${
+                equipped.boots.attackBonus ??
+                equipped.boots.attack ?? 0
+            } Attack)`
+            : "None equipped"
+    }</p>
+`;
 
     if (inventory.length === 0) {
         inventoryContainer.innerHTML =
@@ -1249,7 +1281,10 @@ function renderInventory() {
         }
 
         const canEquip =
-            item.type === "weapon" || item.type === "armor";
+            item.type === "weapon" || item.type === "armor" || item.type === "boots";
+
+        const canUse = item.type === "consumable";
+        
 
         return `
             <div class="inventory-item rarity-${rarity.toLowerCase()}">
@@ -1258,40 +1293,62 @@ function renderInventory() {
                     <p>${rarity} ${item.type} · ${bonusText}</p>
                 </div>
 
-                ${
-                    canEquip
-                        ? `<button onclick="equipItem(${index})">Equip</button>`
-                        : ""
-                }
-            </div>
-        `;
-    }).join("");
+
+${
+    canEquip
+        ? `<button onclick="equipItem(${index})">Equip</button>`
+        : ""
+}
+
+${
+    canUse
+        ? `<button onclick="useConsumable(${index})">Use</button>`
+        : ""
+}
+</div>
+`;
+}).join("");
 }
 
 // =========================
 // EQUIP ITEMS
 // =========================
 
+
 function equipItem(index) {
     const item = inventory[index];
 
     if (!item) return;
 
+    // Only weapons, armor, and boots can be equipped.
+    if (!["weapon", "armor", "boots"].includes(item.type)) {
+        return;
+    }
+
     const slot = item.type;
     const previousItem = equipped[slot];
 
+    // Get bonuses from either shop items or enemy loot.
+    const getAttackBonus = equipment =>
+        equipment?.attackBonus ?? equipment?.attack ?? 0;
+
+    const getDefenseBonus = equipment =>
+        equipment?.defenseBonus ?? equipment?.defense ?? 0;
+
     // Remove the previous item's bonuses.
     if (previousItem) {
-        player.attack -= previousItem.attackBonus;
-        player.defense -= previousItem.defenseBonus;
+        player.attack -= getAttackBonus(previousItem);
+        player.defense -= getDefenseBonus(previousItem);
 
+        // Return the old item to inventory.
         inventory.push(previousItem);
     }
 
     // Apply the new item's bonuses.
-    player.attack += item.attackBonus;
-    player.defense += item.defenseBonus;
+    player.attack += getAttackBonus(item);
+    player.defense += getDefenseBonus(item);
 
+    // Equip the new item.
     equipped[slot] = item;
 
     inventory.splice(index, 1);
@@ -1399,6 +1456,7 @@ function storeSavedAdventures(adventures) {
 let currentAdventureId = null;
 
 // Save the current character into their own slot.
+
 function autoSaveGame() {
     if (!player.name || battleActive || !currentAdventureId) {
         return false;
@@ -1410,6 +1468,7 @@ function autoSaveGame() {
         id: currentAdventureId,
         name: player.name,
         player: player,
+        playerGold: playerGold,
         inventory: inventory,
         equipped: equipped,
         defeatedBosses: defeatedBosses,
@@ -1571,10 +1630,14 @@ function loadGame(adventureId) {
 
     inventory = savedData.inventory;
 
-    equipped = {
-        weapon: savedData.equipped.weapon || null,
-        armor: savedData.equipped.armor || null
-    };
+equipped = {
+    weapon: savedData.equipped.weapon || null,
+    armor: savedData.equipped.armor || null,
+    boots: savedData.equipped.boots || null
+};
+
+// Restore saved gold. Older saves default to 150 gold.
+playerGold = savedData.playerGold ?? 150;
 
     defeatedBosses = savedData.defeatedBosses;
 
@@ -1905,3 +1968,36 @@ document
     });
 
     updateTitleMenu();
+
+    
+
+function useConsumable(index) {
+    const item = inventory[index];
+
+    if (!item || item.type !== "consumable") {
+        return;
+    }
+
+    if (item.effect === "heal") {
+        if (player.currentHealth >= player.maxHealth) {
+            alert("Your health is already full!");
+            return;
+        }
+
+        const oldHealth = player.currentHealth;
+
+        player.currentHealth = Math.min(
+            player.currentHealth + item.value,
+            player.maxHealth
+        );
+
+        const healedAmount = player.currentHealth - oldHealth;
+
+        inventory.splice(index, 1);
+
+        alert(`You restored ${healedAmount} health!`);
+
+        renderInventory();
+        autoSaveGame();
+    }
+}
