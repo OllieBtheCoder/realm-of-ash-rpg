@@ -820,3 +820,54 @@ button:active {
     margin: 0 auto;
     padding: 60px 20px;
 }
+
+
+/* BLACKSMITH */
+
+#blacksmith-screen .title-container {
+    max-width: 850px;
+}
+
+#blacksmith-gold {
+    margin: 20px auto;
+    padding: 12px;
+    max-width: 300px;
+    background: rgba(35, 29, 20, 0.95);
+    border: 1px solid #d6ad65;
+    border-radius: 10px;
+    color: #f3cf82;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+#blacksmith-message {
+    margin: 12px auto;
+    min-height: 24px;
+    color: #f3cf82;
+}
+
+#blacksmith-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+    text-align: left;
+}
+
+.blacksmith-item {
+    padding: 18px;
+    background: rgba(25, 22, 29, 0.95);
+    border: 1px solid #a77b43;
+    border-radius: 12px;
+    color: #f4e8d2;
+}
+
+.blacksmith-item h3 {
+    color: #e6bd78;
+    margin-top: 0;
+}
+
+.blacksmith-item button {
+    width: 100%;
+    margin-top: 10px;
+}

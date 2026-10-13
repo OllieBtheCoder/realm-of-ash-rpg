@@ -1787,6 +1787,72 @@ function showShop() {
     showScreen("shop-screen");
 }
 
+
+function showBlacksmith() {
+    renderBlacksmith();
+    showScreen("blacksmith-screen");
+}
+
+
+function renderBlacksmith() {
+    const itemsContainer =
+        document.getElementById("blacksmith-items");
+
+    const goldDisplay =
+        document.getElementById("blacksmith-gold");
+
+    if (!itemsContainer || !goldDisplay) {
+        return;
+    }
+
+    goldDisplay.textContent = `💰 Gold: ${playerGold}`;
+
+    const equipmentSlots = [
+        { slot: "weapon", label: "⚔️ Weapon" },
+        { slot: "armor", label: "🛡️ Armor" },
+        { slot: "boots", label: "👢 Boots" }
+    ];
+
+    itemsContainer.innerHTML = equipmentSlots.map(entry => {
+        const item = equipped[entry.slot];
+
+        if (!item) {
+            return `
+                <div class="blacksmith-item">
+                    <h3>${entry.label}</h3>
+                    <p>No equipment equipped.</p>
+                    <p>Equip an item before upgrading it!</p>
+                </div>
+            `;
+        }
+
+        const upgradeLevel = item.upgradeLevel ?? 0;
+        const upgradeCost = 50 + upgradeLevel * 50;
+
+        const attackBonus =
+            item.attackBonus ?? item.attack ?? 0;
+
+        const defenseBonus =
+            item.defenseBonus ?? item.defense ?? 0;
+
+        return `
+            <div class="blacksmith-item">
+                <h3>${entry.label}: ${escapeHTML(item.name)}</h3>
+                <p>Upgrade Level: ${upgradeLevel}</p>
+                <p>Attack Bonus: +${attackBonus}</p>
+                <p>Defense Bonus: +${defenseBonus}</p>
+                <p>Upgrade Cost: 💰 ${upgradeCost}</p>
+                <button
+                    onclick="upgradeEquipment('${entry.slot}')"
+                >
+                    Upgrade Equipment
+                </button>
+            </div>
+        `;
+    }).join("");
+}
+
+
 function renderShop() {
     const shopContainer = document.getElementById("shop-items");
     const goldDisplay = document.getElementById("player-gold");
@@ -1815,6 +1881,75 @@ function renderShop() {
         `;
     }).join("");
 }
+
+
+function upgradeEquipment(slot) {
+    if (!["weapon", "armor", "boots"].includes(slot)) {
+        return;
+    }
+
+    const item = equipped[slot];
+
+    if (!item) {
+        showBlacksmithMessage("Equip an item first!");
+        return;
+    }
+
+    const upgradeLevel = item.upgradeLevel ?? 0;
+    const upgradeCost = 50 + upgradeLevel * 50;
+
+    if (playerGold < upgradeCost) {
+        showBlacksmithMessage(
+            `Not enough gold! You need ${upgradeCost} gold.`
+        );
+        return;
+    }
+
+    const attackIncrease = slot === "weapon" ? 5 : 2;
+    const defenseIncrease = slot === "weapon" ? 0 : 3;
+
+    // Deduct gold.
+    playerGold -= upgradeCost;
+
+    // Increase the player's stats.
+    player.attack += attackIncrease;
+    player.defense += defenseIncrease;
+
+    // Update the item's bonuses.
+    if (item.attackBonus !== undefined || item.attack === undefined) {
+        item.attackBonus =
+            (item.attackBonus ?? item.attack ?? 0) + attackIncrease;
+    } else {
+        item.attack += attackIncrease;
+    }
+
+    if (item.defenseBonus !== undefined || item.defense === undefined) {
+        item.defenseBonus =
+            (item.defenseBonus ?? item.defense ?? 0) + defenseIncrease;
+    } else {
+        item.defense += defenseIncrease;
+    }
+
+    item.upgradeLevel = upgradeLevel + 1;
+
+    renderBlacksmith();
+    renderInventory();
+    autoSaveGame();
+
+    showBlacksmithMessage(
+        `${item.name} upgraded to level ${item.upgradeLevel}!`
+    );
+}
+
+function showBlacksmithMessage(message) {
+    const messageElement =
+        document.getElementById("blacksmith-message");
+
+    if (messageElement) {
+        messageElement.textContent = message;
+    }
+}
+
 
 function buyShopItem(itemId) {
     const item = shopItems.find(item => item.id === itemId);
