@@ -258,6 +258,59 @@ const questDefinitions = [
     }
 ];
 
+
+
+const shopItems = [
+    {
+        id: "shop-health-potion",
+        name: "Health Potion",
+        description: "Restores 50 health when used.",
+        price: 30,
+        type: "consumable",
+        effect: "heal",
+        value: 50
+    },
+    {
+        id: "shop-greater-potion",
+        name: "Greater Health Potion",
+        description: "Restores 100 health when used.",
+        price: 55,
+        type: "consumable",
+        effect: "heal",
+        value: 100
+    },
+    {
+        id: "shop-iron-sword",
+        name: "Iron Sword",
+        description: "A sturdy sword for close combat.",
+        price: 100,
+        type: "weapon",
+        attack: 10,
+        defense: 0,
+        health: 0
+    },
+    {
+        id: "shop-guardian-armor",
+        name: "Guardian Armor",
+        description: "Heavy armor that improves your defenses.",
+        price: 120,
+        type: "armor",
+        attack: 0,
+        defense: 8,
+        health: 20
+    },
+    {
+        id: "shop-travel-boots",
+        name: "Traveler's Boots",
+        description: "Light boots that help you travel safely.",
+        price: 75,
+        type: "boots",
+        attack: 2,
+        defense: 3,
+        health: 0
+    }
+];
+
 // Each new adventure starts with fresh quest progress.
 function createQuestProgress() {
     const progress = {};
@@ -273,6 +326,8 @@ function createQuestProgress() {
 }
 
 let questProgress = createQuestProgress();
+
+let playerGold = 150;
 
 
 function completeQuest(quest) {
@@ -573,6 +628,7 @@ function createCharacter() {
         speed: classData.speed + raceData.speed,
         magic: classData.magic + raceData.magic,
 
+        playerGold: 150,
         level: 1,
         xp: 0,
         xpToNextLevel: 100
@@ -1148,6 +1204,7 @@ function awardLoot() {
 // DISPLAY INVENTORY
 // =========================
 
+
 function renderInventory() {
     const equippedContainer =
         document.getElementById("equipped-items");
@@ -1174,28 +1231,40 @@ function renderInventory() {
     if (inventory.length === 0) {
         inventoryContainer.innerHTML =
             "<p>Your inventory is empty. Defeat enemies to find loot!</p>";
-
         return;
     }
 
     inventoryContainer.innerHTML = inventory.map((item, index) => {
-        const bonusText = item.type === "weapon"
-            ? `+${item.attackBonus} Attack`
-            : `+${item.defenseBonus} Defense`;
+        const rarity = item.rarity || "Common";
 
-        
-return `
-    <div class="inventory-item rarity-${item.rarity.toLowerCase()}">
-        <div>
-            <strong class="item-name">${item.name}</strong>
-            <p>${item.rarity} ${item.type} · ${bonusText}</p>
-        </div>
+        let bonusText;
 
-        <button onclick="equipItem(${index})">
-            Equip
-        </button>
-    </div>
-`;
+        if (item.type === "weapon") {
+            bonusText = `+${item.attackBonus ?? item.attack ?? 0} Attack`;
+        } else if (item.type === "consumable") {
+            bonusText = `Restores ${item.value ?? 0} Health`;
+        } else {
+            bonusText =
+                `+${item.defenseBonus ?? item.defense ?? 0} Defense`;
+        }
+
+        const canEquip =
+            item.type === "weapon" || item.type === "armor";
+
+        return `
+            <div class="inventory-item rarity-${rarity.toLowerCase()}">
+                <div>
+                    <strong class="item-name">${item.name}</strong>
+                    <p>${rarity} ${item.type} · ${bonusText}</p>
+                </div>
+
+                ${
+                    canEquip
+                        ? `<button onclick="equipItem(${index})">Equip</button>`
+                        : ""
+                }
+            </div>
+        `;
     }).join("");
 }
 
@@ -1647,6 +1716,79 @@ function updateActiveQuestTracker() {
         </div>
         <p><strong>Reward:</strong> ${quest.rewardXP} XP + ${escapeHTML(quest.rewardItem)}</p>
     `;
+}
+
+
+function showShop() {
+    renderShop();
+    showScreen("shop-screen");
+}
+
+function renderShop() {
+    const shopContainer = document.getElementById("shop-items");
+    const goldDisplay = document.getElementById("player-gold");
+
+    if (!shopContainer || !goldDisplay) {
+        return;
+    }
+
+    goldDisplay.textContent = `💰 Gold: ${playerGold}`;
+
+    shopContainer.innerHTML = shopItems.map(item => {
+        const canAfford = playerGold >= item.price;
+
+        return `
+            <div class="shop-item">
+                <h3>${escapeHTML(item.name)}</h3>
+                <p>${escapeHTML(item.description)}</p>
+                <p><strong>Price:</strong> 💰 ${item.price}</p>
+                <button
+                    onclick="buyShopItem('${item.id}')"
+                    ${canAfford ? "" : "disabled"}
+                >
+                    ${canAfford ? "Buy Item" : "Not Enough Gold"}
+                </button>
+            </div>
+        `;
+    }).join("");
+}
+
+function buyShopItem(itemId) {
+    const item = shopItems.find(item => item.id === itemId);
+
+    if (!item) {
+        return;
+    }
+
+    if (playerGold < item.price) {
+        showShopMessage("You don't have enough gold!");
+        renderShop();
+        return;
+    }
+
+    playerGold -= item.price;
+
+    // Add a separate copy to the player's inventory.
+    const purchasedItem = {
+        ...item,
+        id: `item-${Date.now()}-${Math.floor(Math.random() * 100000)}`
+    };
+
+    inventory.push(purchasedItem);
+
+    renderShop();
+    renderInventory();
+    autoSaveGame();
+
+    showShopMessage(`Purchased ${item.name}!`);
+}
+
+function showShopMessage(message) {
+    const messageElement = document.getElementById("shop-message");
+
+    if (messageElement) {
+        messageElement.textContent = message;
+    }
 }
 
 function showQuests() {

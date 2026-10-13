@@ -216,15 +216,11 @@
                         💾 Save Game
                     </button>
 
-                    <button onclick="loadGame()">
-                        📜 Load Game
-                    </button>
 
-                    
-                    <button class="secondary" onclick="showCharacterCreation()">
-                        🆕 New Character
-                    </button>
 
+                    <button onclick="showShop()">
+                        🛒 Merchant Shop
+                    </button>  
                 </div>
 
             </div>
@@ -317,6 +313,29 @@
 
         <div id="quest-list">
             <p>Your quests will appear here.</p>
+        </div>
+
+        <button onclick="returnToGame()">
+            ← Return to Adventure
+        </button>
+    </div>
+</section>
+
+
+<!-- MERCHANT SHOP SCREEN -->
+<section id="shop-screen" class="screen">
+    <div class="title-container">
+        <h1>🛒 The Merchant</h1>
+        <p>Welcome, adventurer. Find what you need for the road ahead.</p>
+
+        <div id="player-gold">
+            💰 Gold: 0
+        </div>
+
+        <div id="shop-message"></div>
+
+        <div id="shop-items">
+            <p>Loading merchandise...</p>
         </div>
 
         <button onclick="returnToGame()">

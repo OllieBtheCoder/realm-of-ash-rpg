@@ -737,3 +737,59 @@ button:active {
 .quest-tracker button {
     margin-top: 8px;
 }
+
+
+/* MERCHANT SHOP */
+
+#shop-screen .title-container {
+    max-width: 850px;
+}
+
+#player-gold {
+    margin: 20px auto;
+    padding: 12px;
+    max-width: 300px;
+    background: rgba(35, 29, 20, 0.95);
+    border: 1px solid #d6ad65;
+    border-radius: 10px;
+    color: #f3cf82;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+#shop-message {
+    margin: 12px auto;
+    min-height: 24px;
+    color: #f3cf82;
+}
+
+#shop-items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+    margin: 24px 0;
+    text-align: left;
+}
+
+.shop-item {
+    padding: 18px;
+    background: rgba(25, 22, 29, 0.95);
+    border: 1px solid #a77b43;
+    border-radius: 12px;
+    color: #f4e8d2;
+}
+
+.shop-item h3 {
+    color: #e6bd78;
+    margin-top: 0;
+}
+
+.shop-item button {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.shop-item button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
